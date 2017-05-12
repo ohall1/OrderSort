@@ -512,7 +512,9 @@ void Analysis::CloseEvent(){
 	  hit.z     = (it->second).z;
 	  hit.ex    = (it->second).ex;           // p-side strips
 	  hit.ey    = (it->second).ey;           // n-side strips
-	  hit.flag  = (it->second).flag;       //1, 2, ..., 6. Implant flag from Calibrator.cpp 10+det# (i.e. DSSD 1 = det0) (?)
+    hit.nx    = (it->second).nx;           // p-side strips
+    hit.ny    = (it->second).ny;           // n-side stripa
+    hit.flag  = 4;//(it->second).flag;       //1, 2, ..., 6. Implant flag from Calibrator.cpp 10+det# (i.e. DSSD 1 = det0) (?)
 
 	  out_root_tree->Fill();  // Write to tree
 	  hEvt_Mult_impdec->Fill(total_evt_mult[hit.z][0]);
@@ -528,7 +530,9 @@ void Analysis::CloseEvent(){
 	  hit.z     = (it->second).z;
 	  hit.ex    = (it->second).ex;           // p-side strips
 	  hit.ey    = (it->second).ey;           // n-side strips
-	  hit.flag  = (it->second).flag;       //1, 2, ..., 6. Implant flag from Calibrator.cpp 10+det# (i.e. DSSD 1 = det0) (?)
+    hit.nx    = (it->second).nx;           // p-side strips
+    hit.ny    = (it->second).ny;           // n-side stripa
+	  hit.flag  = 5;//(it->second).flag;       //1, 2, ..., 6. Implant flag from Calibrator.cpp 10+det# (i.e. DSSD 1 = det0) (?)
 	  
 	  out_root_tree->Fill();
 	}
@@ -1586,7 +1590,7 @@ void Analysis::InitAnalysis(int opt, char *file_name){
     std::cout << " ***     Analysis::InitAnalysis(): initializing TTree" << std::endl;
     //Initialize TTree
     out_root_tree = new TTree("AIDA_hits","AIDA_hits");
-    out_root_tree->Branch("aida_hit",&hit,"t/L:t_ext/L:x/I:y/I:z/I:ex/I:ey/I:flag/I");
+    out_root_tree->Branch("aida_hit",&hit,"t/L:t_ext/L:x/I:y/I:z/I:ex/I:ey/I:nx/I:ny/I:flag/I");
     SetBRootTree(true);
   }
 

@@ -182,9 +182,9 @@ class Analysis{
    *
    */
   struct dssd_hit{
-  dssd_hit():t(-999),t_ext(-999),x(-999),y(-999),z(-999),ex(-999),ey(-999),flag(-999){}
-  dssd_hit(cluster_evt x, cluster_evt y):t(-999),t_ext(-999),x(x.x),y(y.y),z(x.z),ex(x.energy),ey(y.energy),flag(x.flag){}
-  dssd_hit(const dssd_hit& a):t(a.t),t_ext(a.t_ext),x(a.x),y(a.y),z(a.z),ex(a.ex),ey(a.ey),flag(a.flag){}
+  dssd_hit():t(-999),t_ext(-999),x(-999),y(-999),z(-999),ex(-999),ey(-999),nx(-999),ny(-999),flag(-999){}
+  dssd_hit(cluster_evt x, cluster_evt y):t(-999),t_ext(-999),x(x.x),y(y.y),z(x.z),ex(x.energy),ey(y.energy),nx(x.mult),ny(y.mult),flag(x.flag){}
+  dssd_hit(const dssd_hit& a):t(a.t),t_ext(a.t_ext),x(a.x),y(a.y),z(a.z),ex(a.ex),ey(a.ey),nx(a.nx),ny(a.ny),flag(a.flag){}
     Long64_t t;
     Long64_t t_ext;
     int x;
@@ -192,6 +192,8 @@ class Analysis{
     int z;
     int ex;
     int ey;
+    int nx;
+    int ny;
     int flag;
   };
   
