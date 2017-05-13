@@ -196,9 +196,26 @@ class Analysis{
     int ny;
     int flag;
   };
-  
-  dssd_hit hit;
-  
+
+  struct root_evt{
+  root_evt():T(0),Tfast(0),E(0),Ex(0),Ey(0),x(0),y(0),z(0),nx(0),ny(0),nz(0),ID(8){}
+  root_evt(dssd_hit evt):T(ULong_t(evt.t)),Tfast(ULong_t(evt.t_ext)),E(Double_t(evt.ex + evt.ey)),
+    Ex(Double_t(evt.ex)),Ey(Double_t(evt.ey)),x(Double_t(evt.x)),y(Double_t(evt.y)),z(Double_t(evt.z)),nx(evt.nx),ny(evt.ny),nz(1),ID(8){}
+  ULong_t T;
+  ULong_t Tfast;
+  Double_t E;
+  Double_t Ex;
+  Double_t Ey;
+  Double_t x;
+  Double_t y;
+  Double_t z;
+  Int_t nx;
+  Int_t ny;
+  Int_t nz;   //Pointless variable required by BRIKEN merger
+  UChar_t ID;
+  };
+  root_evt hit;
+    
   typedef std::multimap<int, std::multimap<int, dssd_evt> > Hit_array;  ///< Multimap typedef to hold dssd_hits. [DSSD]<side, <strip, evt_info> >
   Hit_array decay_hits[common::N_DSSD];            ///< Array to contain decay events in each detector
   Hit_array implant_hits[common::N_DSSD];          ///< Array to contain decay events in each detector

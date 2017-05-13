@@ -504,7 +504,7 @@ void Analysis::CloseEvent(){
 
       if(b_implant) {
 	for(Event_array::iterator it=implant_evts.begin(); it!=implant_evts.end(); ++it) {
-	  //Set info
+	  /*//Set info
 	  hit.t     = (it->second).t;
 	  hit.t_ext = (it->second).t_ext;
 	  hit.x     = (it->second).x;
@@ -514,15 +514,19 @@ void Analysis::CloseEvent(){
 	  hit.ey    = (it->second).ey;           // n-side strips
     hit.nx    = (it->second).nx;           // p-side strips
     hit.ny    = (it->second).ny;           // n-side stripa
-    hit.flag  = 4;//(it->second).flag;       //1, 2, ..., 6. Implant flag from Calibrator.cpp 10+det# (i.e. DSSD 1 = det0) (?)
+    hit.flag  = 4;//(it->second).flag;       //1, 2, ..., 6. Implant flag from Calibrator.cpp 10+det# (i.e. DSSD 1 = det0) (?)*/
+    root_evt root_imp((it->second));
+    root_imp.ID = 4; // ID 4 defines implant 5 defines decay
+    hit = root_imp;
 
 	  out_root_tree->Fill();  // Write to tree
-	  hEvt_Mult_impdec->Fill(total_evt_mult[hit.z][0]);
+	  hEvt_Mult_impdec->Fill(total_evt_mult[(it->second).z][0]);
 	  //std::cout << "Implant event written to tree." << std::endl;
 	}
       }
       else if( b_decay && !b_implant && !b_pulser ){    // Else if decay event present... (do the same)
 	for(Event_array::iterator it=decay_evts.begin(); it!=decay_evts.end(); ++it){
+    /*
 	  hit.t     = (it->second).t;
 	  hit.t_ext = (it->second).t_ext;
 	  hit.x     = (it->second).x;
@@ -532,7 +536,10 @@ void Analysis::CloseEvent(){
 	  hit.ey    = (it->second).ey;           // n-side strips
     hit.nx    = (it->second).nx;           // p-side strips
     hit.ny    = (it->second).ny;           // n-side stripa
-	  hit.flag  = 5;//(it->second).flag;       //1, 2, ..., 6. Implant flag from Calibrator.cpp 10+det# (i.e. DSSD 1 = det0) (?)
+	  hit.flag  = 5;//(it->second).flag;       //1, 2, ..., 6. Implant flag from Calibrator.cpp 10+det# (i.e. DSSD 1 = det0) (?)*/
+    root_evt root_dec((it->second));
+    root_dec.ID = 5; // ID 4 defines implant 5 defines decay
+    hit = root_dec;
 	  
 	  out_root_tree->Fill();
 	}
@@ -1590,7 +1597,7 @@ void Analysis::InitAnalysis(int opt, char *file_name){
     std::cout << " ***     Analysis::InitAnalysis(): initializing TTree" << std::endl;
     //Initialize TTree
     out_root_tree = new TTree("AIDA_hits","AIDA_hits");
-    out_root_tree->Branch("aida_hit",&hit,"t/L:t_ext/L:x/I:y/I:z/I:ex/I:ey/I:nx/I:ny/I:flag/I");
+    out_root_tree->Branch("aida_hit",&hit,"T/l:Tfast/l:E/D:EX/D:EY/D:x/D:y/D:z/D:nx/I:ny/I:nz/I:ID/b");
     SetBRootTree(true);
   }
 
@@ -1744,14 +1751,14 @@ void Analysis::ResetEvent(){
   
   t_aida_prev = -999;
   
-  hit.t     = -1;
+  /*hit.T     = -1;
   hit.t_ext = -1;
   hit.x     = -1;
   hit.y     = -1;
   hit.z     = -1;
   hit.ex    = -1;
   hit.ey    = -1;
-  hit.flag  = -1;
+  hit.flag  = -1;*/
 
   for(int i=0; i<common::N_DSSD; i++){
     
@@ -2313,14 +2320,14 @@ Analysis::Analysis(){
   evt_data.decay_flag= 0;
   evt_data.implant_flag= 0;
 
-  hit.t= -1;
+  /*hit.t= -1;
   hit.t_ext= -1;
   hit.x= -1;
   hit.y= -1;
   hit.z= -1;
   hit.ex= -1;
   hit.ey= -1;
-  hit.flag= -1;
+  hit.flag= -1;*/
 
 
 }
