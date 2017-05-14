@@ -193,7 +193,7 @@ int main  (int argc, char **argv){
 
   std::string FileNameData="";
 
-  char *FileCalibParameters= (char*)"config/parameters_Sept2016.txt";
+  char *FileCalibParameters= (char*)"config/parameters_Phong.txt";
   std::string FileNameRoot=""; //= "aida_sort_" + RunName +".root";
   TFile * fMain; //= new TFile(FileNameRoot.data(),"RECREATE");
 
