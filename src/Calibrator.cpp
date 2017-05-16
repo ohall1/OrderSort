@@ -69,12 +69,14 @@ void Calibrator::Process(Unpacker & my_unp_data){
 
     else if(my_unp_data.GetInfoCode()==8){   //If correlation scalar
 
-      if(  GetModule()==13 ||GetModule()==14 ||GetModule()==16  ){
+      //if(  GetModule()==13 ||GetModule()==14 ||GetModule()==16  ){
 
-	int64_t offset=  4*my_unp_data.GetCorrScaler() - my_unp_data.GetTmStp(); //AIDA= 100MHz Corr scaler= 25MHz
+	Long_t offset=  4*my_unp_data.GetCorrScaler() - my_unp_data.GetTmStp(); //AIDA= 100MHz Corr scaler= 25MHz
+  //std::cout << "Offset " << offset << " Corr Scalar " << my_unp_data.GetCorrScaler() << " TmStp " << my_unp_data.GetTmStp() << std::endl;
 
 	SetBCorrStatus(true);
 	SetTmStpOffset(offset);
+ // std::cout << "Offset set " << offset << " Offsetread " << GetTmStpOffset() << std::endl;
 
 	if(b_debug){
 	  std::cout << " OFFFFFFFFFFFFFFFFFFFFF: " << offset<<std::endl;
@@ -83,7 +85,7 @@ void Calibrator::Process(Unpacker & my_unp_data){
 	  printf("  INFO 0x%lX \n", my_unp_data.GetInfoField());
 	}
 
-      }
+      //}
 
       SetInfoCode(my_unp_data.GetInfoCode());
       //SetBPushData(true);
@@ -115,7 +117,8 @@ void Calibrator::Process(Unpacker & my_unp_data){
   if(GetBPushData() || GetBFillTree() ){
 
     //timing only if it makes sense...
-    SetTimeAIDA(my_unp_data.GetTmStp());
+    //std::cout << " Offset " << GetTmStpOffset() << std::endl;
+    SetTimeAIDA((my_unp_data.GetTmStp()+GetTmStpOffset())*10);
 
     if(GetDataType()==3) SetDiscFlag(SetTimeDisc()); // check if thre is a fast disc. value for this ADC hit
 
@@ -574,6 +577,8 @@ void Calibrator::CalibrateADC(){
   }
   
   else SetADCenergy(-88888);
+
+  //SetADCTmStp();
 }
 
 /*******************************************************************
@@ -659,7 +664,7 @@ void Calibrator::SetTmStpDisc(unsigned long value){
 
 }
 
-void Calibrator::SetTmStpOffset(int64_t value){ //diff AIDA->EXTERNAL tm-stp
+void Calibrator::SetTmStpOffset(Long_t value){ //diff AIDA->EXTERNAL tm-stp
   //double offset=  aida_time_calib*(my_unp_data.GetCorrScaler() - my_unp_data.GetTmStp());
 
   tm_stp_corr_offset= value; 
@@ -703,6 +708,11 @@ void Calibrator::SetTimeExternal(){
 
 void Calibrator::SetADCenergy(double value){
   cal_data.adc_energy= value;
+}
+
+void Calibrator::SetADCTmStp(){
+  std::cout << "TmStp "<< cal_data.time_aida << " OFfset " << GetTmStpOffset() <<std::endl;
+  cal_data.time_aida = (cal_data.time_aida + GetTmStpOffset())*10;
 }
 
 void Calibrator::SetADCdata(int value){
@@ -768,7 +778,7 @@ bool Calibrator::GetBCorrStatus(){ return b_corr_status; }
 
 unsigned long Calibrator::GetTmStpDisc(){ return tm_stp_disc[GetModule()-1][GetChannel()]; }
 
-int64_t Calibrator::GetTmStpOffset(){ return tm_stp_corr_offset; }
+Long_t Calibrator::GetTmStpOffset(){ return tm_stp_corr_offset; }
 
 //Getters... for cal_data structure
 double Calibrator::GetTimeAIDA(){ return cal_data.time_aida; }
