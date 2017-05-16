@@ -669,8 +669,8 @@ void Calibrator::SetTmStpOffset(Long_t value){ //diff AIDA->EXTERNAL tm-stp
 
   if(tm_stp_corr_offset != value){
     std::cout << "Old offset " << tm_stp_corr_offset << " New ffset = " << value <<std::endl;
+    tm_stp_corr_offset= value; 
   }
-  tm_stp_corr_offset= value; 
   //tm_stp_corr_offset= 1.*t_EXT - aida_time_calib*t_AIDA;
 }
 
