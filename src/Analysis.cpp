@@ -346,8 +346,18 @@ void Analysis::CloseEvent(){
 	  }
 	  
 	  dssd_hit evt(x_clusts->second,y_clusts->second);
-	  if( (x_clusts->second).t < (y_clusts->second).t )	 {evt.t = (x_clusts->second).t; evt.t_ext = (x_clusts->second).t_ext;}
-	  else if( (y_clusts->second).t < (x_clusts->second).t ) {evt.t = (y_clusts->second).t; evt.t_ext = (y_clusts->second).t_ext;}
+	  if( (x_clusts->second).t < (y_clusts->second).t && ((x_clusts->second).t > 0) && ((y_clusts->second).t > 0)){
+      evt.t = (x_clusts->second).t; evt.t_ext = (x_clusts->second).t_ext;
+    }
+	  else if( (y_clusts->second).t < (x_clusts->second).t && ((x_clusts->second).t > 0) && ((y_clusts->second).t > 0)){
+      evt.t = (y_clusts->second).t; evt.t_ext = (y_clusts->second).t_ext;
+    }
+    else if( (x_clusts->second).t == (y_clusts->second).t){
+      evt.t = (x_clusts->second).t; evt.t_ext = (x_clusts->second).t_ext;
+    }
+    else{
+      evt.t = 0; evt.t_ext = 0;
+    }
 	  implant_evts.insert({evt.t,evt});
 	  ++imp_num;
 	  b_implant = true;
@@ -487,8 +497,15 @@ void Analysis::CloseEvent(){
 	  }
 
 	  dssd_hit evt(x_clusts->second,y_clusts->second);
-	  if( (x_clusts->second).t < (y_clusts->second).t )	 {evt.t = (x_clusts->second).t; evt.t_ext = (x_clusts->second).t_ext;}
-	  else if( (y_clusts->second).t < (x_clusts->second).t ) {evt.t = (y_clusts->second).t; evt.t_ext = (y_clusts->second).t_ext;}
+	  if( (x_clusts->second).t < (y_clusts->second).t && ((x_clusts->second).t > 0) && ((y_clusts->second).t > 0)){
+      evt.t = (x_clusts->second).t; evt.t_ext = (x_clusts->second).t_ext;
+    }
+	  else if( (y_clusts->second).t < (x_clusts->second).t && ((x_clusts->second).t > 0) && ((y_clusts->second).t > 0)){
+      evt.t = (y_clusts->second).t; evt.t_ext = (y_clusts->second).t_ext;
+    }
+    else if ((x_clusts->second).t == (y_clusts->second).t){
+      evt.t = (x_clusts->second).t; evt.t_ext = (x_clusts->second).t_ext;
+    }
 	  decay_evts.insert({evt.t,evt});
 	  ++dec_num;
 	  b_decay = true;
