@@ -31,7 +31,7 @@ class Calibrator{
 
   // ----- correlations in time of different types -----
   unsigned long tm_stp_disc[common::N_FEE64][common::N_CHANNEL]; //latest disc tm stp!
-  Long_t tm_stp_corr_offset;
+  double tm_stp_corr_offset;
 
   int hist_fill_count;
   static const int n_update = 10000000;
@@ -157,13 +157,12 @@ class Calibrator{
   //void SetBCorrOffset(bool flag);
 
   void SetTmStpDisc(unsigned long value);
-  void SetTmStpOffset(Long_t value); //time difference AIDA->EXTERNAL
+  void SetTmStpOffset(int64_t value); //time difference AIDA->EXTERNAL
 
 
   //Setters... for cal_data structure
   void SetTimeAIDA(double value);
   bool SetTimeDisc();
-  void SetADCTmStp();
   void SetTimeExternal();
   void SetADCenergy(double value);
 
@@ -197,7 +196,7 @@ class Calibrator{
   //bool GetBCorrOffset();
 
   unsigned long GetTmStpDisc();
-  Long_t GetTmStpOffset();
+  int64_t GetTmStpOffset();
 
   //Getters... for cal_data structure
   double GetTimeAIDA();
