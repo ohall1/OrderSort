@@ -516,7 +516,9 @@ void Analysis::CloseEvent(){
     hit.ny    = (it->second).ny;           // n-side stripa
     hit.flag  = 4;//(it->second).flag;       //1, 2, ..., 6. Implant flag from Calibrator.cpp 10+det# (i.e. DSSD 1 = det0) (?)*/
     root_evt root_imp((it->second));
+    root_imp.T = ((it->second).t + tmStpCorrOffeset)*10;
     root_imp.ID = 4; // ID 4 defines implant 5 defines decay
+    //std::cout << root_imp.T <<std::endl;
     hit = root_imp;
 
 	  out_root_tree->Fill();  // Write to tree
@@ -538,6 +540,7 @@ void Analysis::CloseEvent(){
     hit.ny    = (it->second).ny;           // n-side stripa
 	  hit.flag  = 5;//(it->second).flag;       //1, 2, ..., 6. Implant flag from Calibrator.cpp 10+det# (i.e. DSSD 1 = det0) (?)*/
     root_evt root_dec((it->second));
+    root_dec.T = ((it->second).t + tmStpCorrOffeset)*10;
     root_dec.ID = 5; // ID 4 defines implant 5 defines decay
     hit = root_dec;
 	  
@@ -554,6 +557,7 @@ void Analysis::CloseEvent(){
 void Analysis::InitEvent(Calibrator & my_cal_data){
     
   ResetEvent();
+  tmStpCorrOffeset = my_cal_data.GetTmStpOffset();
 
   //check again just in case we're trying to initialize with wrong data
   if(/*!my_cal_data.GetADCrange() || */!IsChEnabled(my_cal_data)){

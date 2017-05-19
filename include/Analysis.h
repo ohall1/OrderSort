@@ -56,6 +56,7 @@ class Analysis{
   int64_t t0_aida;
   int64_t t0_ext;
   int64_t t_aida_prev;
+  int64_t tmStpCorrOffeset;
 
   bool b_first_ts;
   int64_t first_ts, last_ts;

@@ -69,12 +69,17 @@ void Calibrator::Process(Unpacker & my_unp_data){
 
     else if(my_unp_data.GetInfoCode()==8){   //If correlation scalar
 
-      if(  GetModule()==13 ||GetModule()==14 ||GetModule()==16  ){
+  //    if(  GetModule()==13 ||GetModule()==14 ||GetModule()==16  ){
 
 	int64_t offset=  4*my_unp_data.GetCorrScaler() - my_unp_data.GetTmStp(); //AIDA= 100MHz Corr scaler= 25MHz
 
+  if(tm_stp_corr_offset != offset){
+    std::cout << "Old offset = " << tm_stp_corr_offset << " New offset = " << offset <<std::endl;
+    SetTmStpOffset(offset);
+
+  }
+
 	SetBCorrStatus(true);
-	SetTmStpOffset(offset);
 
 	if(b_debug){
 	  std::cout << " OFFFFFFFFFFFFFFFFFFFFF: " << offset<<std::endl;
@@ -83,7 +88,7 @@ void Calibrator::Process(Unpacker & my_unp_data){
 	  printf("  INFO 0x%lX \n", my_unp_data.GetInfoField());
 	}
 
-      }
+      //}
 
       SetInfoCode(my_unp_data.GetInfoCode());
       //SetBPushData(true);
