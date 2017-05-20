@@ -76,6 +76,11 @@ void Analysis::Process(DataSource & my_source, Calibrator & my_cal_data){
  */
 bool Analysis::BuildEvent(Calibrator & my_cal_data){
 
+    if(tmStpCorrOffeset != my_cal_data.GetTmStpOffset()){
+      tmStpCorrOffeset = my_cal_data.GetTmStpOffset();
+    }
+
+
   ++numbers;
 
   if(!IsChEnabled(my_cal_data)) return false; //skip channels not enabled
@@ -538,7 +543,9 @@ void Analysis::CloseEvent(){
     //std::cout << root_imp.T <<std::endl;
     hit = root_imp;
 
-	  out_root_tree->Fill();  // Write to tree
+    if (tmStpCorrOffeset != 0){
+	   out_root_tree->Fill();  // Write to tree
+    }
 	  hEvt_Mult_impdec->Fill(total_evt_mult[(it->second).z][0]);
 	  //std::cout << "Implant event written to tree." << std::endl;
 	}
@@ -560,8 +567,9 @@ void Analysis::CloseEvent(){
     root_dec.T = ((it->second).t + tmStpCorrOffeset)*10;
     root_dec.ID = 5; // ID 4 defines implant 5 defines decay
     hit = root_dec;
-	  
-	  out_root_tree->Fill();
+	  if(tmStpCorrOffeset != 0){
+	   out_root_tree->Fill();
+    }
 	}
       }
     }
@@ -574,7 +582,6 @@ void Analysis::CloseEvent(){
 void Analysis::InitEvent(Calibrator & my_cal_data){
     
   ResetEvent();
-  tmStpCorrOffeset = my_cal_data.GetTmStpOffset();
 
   //check again just in case we're trying to initialize with wrong data
   if(/*!my_cal_data.GetADCrange() || */!IsChEnabled(my_cal_data)){
