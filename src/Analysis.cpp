@@ -103,7 +103,6 @@ bool Analysis::BuildEvent(Calibrator & my_cal_data){
 
   t_aida_prev = my_cal_data.GetTimeAIDA();
   evt_data.dt = my_cal_data.GetTimeAIDA() - evt_data.t0; //assume monotonically increasing tm-stps
-
   if( (int)my_cal_data.GetADCrange() == 1 )        {BuildImplant(my_cal_data); ++implant_words;}
   else if( (int)my_cal_data.GetADCrange() == 0 )   {BuildDecay(my_cal_data); ++decay_words;}
 
@@ -142,9 +141,8 @@ bool Analysis::BuildEvent(Calibrator & my_cal_data){
    }
    
    if(imp_evt.det > 0) {
-     std::multimap<int, dssd_evt> hit;
-     hit.insert({cal.GetStrip(),imp_evt});   
-     implant_hits[cal.GetDSSD()-1].insert({cal.GetSide(),hit});
+     implant_hits[cal.GetDSSD()-1][cal.GetSide()].insert({cal.GetStrip(),imp_evt});
+    // std::cout << implant_hits[cal.GetDSSD()-1][cal.GetSide()].size() << " hello" << std::endl;
 
      e_sum_d[cal.GetDSSD()-1][cal.GetADCrange()] += cal.GetADCenergy();
      ++total_evt_mult[cal.GetDSSD()-1][cal.GetADCrange()];
@@ -170,9 +168,7 @@ void Analysis::BuildDecay(Calibrator & cal){
   }
     
   if(dec_evt.det > 0) {
-    std::multimap<int, dssd_evt> hit;
-    hit.insert({cal.GetStrip(),dec_evt});
-    decay_hits[cal.GetDSSD()-1].insert({cal.GetSide(),hit});
+    decay_hits[cal.GetDSSD()-1][cal.GetSide()].insert({cal.GetStrip(),dec_evt});
     
     e_sum_d[cal.GetDSSD()-1][cal.GetADCrange()] += cal.GetADCenergy();
     ++total_evt_mult[cal.GetDSSD()-1][cal.GetADCrange()];
@@ -204,7 +200,7 @@ void Analysis::CloseEvent(){
 
   int NmaxI=4;        //Max number of strips to be triggered in implant event
   int EminI=500;      //Min Edep for event to be considered real (keV)
-  int N_max_decay=4;  //Man number of strips to be triggered in decay event
+  int N_max_decay=8;  //Man number of strips to be triggered in decay event
 
   // *********************
   //   IMPLANTS IMPLANTS
@@ -214,110 +210,114 @@ void Analysis::CloseEvent(){
     b_evt_up = true;
   
     //Check detector has events and no downstream events
-    if( implant_hits[det].size() > 0 ) {
+    if( implant_hits[det][0].size() > 0 && implant_hits[det][1].size() > 0 ) {
       //std::cout << "    **** " << implant_hits[det].size() << " new implant events in DSSD " << det+1 << " ****" << std::endl;
       for (int down_det = det+1; down_det < common::N_DSSD; ++down_det) {
-	if ( implant_hits[down_det].size() > 0 ) {
-	  b_evt_down = true;
-	  break;
-	}
+	      if ( implant_hits[down_det][0].size() > 0 && implant_hits[down_det][1].size() > 0 ) {
+	          b_evt_down = true;
+	          break;
+        }
       }
     
       //If no events downstream check for events in all upstream detectors. 
       if (!b_evt_down) {
-	++imp_down;
-	for (int up_det = 0; up_det < det; up_det++) {
-	  if( implant_hits[up_det].size() < 1) {
-	    b_evt_up = false;
-	    break;
-	  }
-	}
+	      ++imp_down;
+	      for (int up_det = 0; up_det < det; up_det++) {
+	        if( implant_hits[up_det][0].size() < 1 && implant_hits[up_det][0].size() < 1) {
+	          b_evt_up = false;
+	          break;
+	        }
+	      }
+
 		
 	//If no events downstream and events in all upstream dets, make clusters in final DSSD.
 	if(b_evt_up || det == 0) {
 	  ++imp_up;
 
-	  int multi      = 0;        //Total number of strips in each cluster
-	  int cluster_e  = 0;        //Total energy deposited in each cluster
-	  int max_e      = -999;     //Maximum energy deposited in one strip in cluster
-	  int max_strip  = -999;     //Strip containing maximum energy deposit
-	  int strip_prev = -999;     //Strip previoulsy processed
-	  int side_prev  = -999;     //Side previously processed
-	  int n_hits     = 0;        //
-	  Long64_t t_min = -999;     //Lowest timestamp within cluster
-	  Long64_t t_ext_min = -999; //Lowest t_ext within cluster
+
 	  	    
 	  //std::cout << "size of DSSD map: " << implant_hits[det].size() << std::endl;
 
-	  for( side_it = implant_hits[det].begin(); side_it != implant_hits[det].end(); ++side_it ) { //Loop over side
-	    
-	    ++n_hits;
-	    strip_it = (side_it->second).begin();
-	    //std::cout << "Implant n_hit " << n_hits << " >> det: " << (int)(strip_it->second).det << "\t side: " << (int)(side_it->first) << "\t strip: " << (int)((strip_it->second).strip) << "\t e: " << (int)((strip_it->second).energy) << std::endl;
+	  //for( side_it = implant_hits[det].begin(); side_it != implant_hits[det].end(); ++side_it ) { //Loop over side
+    for(int hitSide = 0 ; hitSide <2 ; hitSide++){ //Loop over side
 
-	    if( (abs(strip_it->first  - strip_prev) == 1 || strip_prev == -999) && (side_it->first == side_prev || side_prev == -999) ){ //If first strip or neighbouring strips on same side, add to cluster
-	      cluster_e += (strip_it->second).energy;
-	      ++multi;
-		
-	      if( (strip_it->second).energy > max_e)                     { max_e = (strip_it->second).energy; max_strip = (strip_it->second).strip;} //Max_e pos
-	      if( (strip_it->second).t < t_min || t_min < 0)             { t_min = (strip_it->second).t;}                                            //Earliest tm_stmp in cluster
-	      if( (strip_it->second).t_ext < t_ext_min || t_ext_min < 0) { t_ext_min = (strip_it->second).t_ext;}                                    //Earliest external tm_stmp in cluster
-	      strip_prev = strip_it->first;
-	      side_prev = side_it->first;
+      //Initialise variables for start of cluster checks
+      int multi      = 0;        //Total number of strips in each cluster
+      int cluster_e  = 0;        //Total energy deposited in each cluster
+      int max_e      = -999;     //Maximum energy deposited in one strip in cluster
+      int max_strip  = -999;     //Strip containing maximum energy deposit
+      int strip_prev = -999;     //Strip previoulsy processed
+      int side_prev  = -999;     //Side previously processed
+      int n_hits     = 0;        //
+      Long64_t t_min = -999;     //Lowest timestamp within cluster
+      Long64_t t_ext_min = -999; //Lowest t_ext within cluster
 
-	    } //End cluster building
+      for( strip_it = implant_hits[det][hitSide].begin() ; strip_it != implant_hits[det][hitSide].end() ; ++strip_it){
+        ++n_hits;
+        //std::cout << "Implant n_hit " << n_hits << " >> det: " << (int)(strip_it->second).det << "\t side: " << (int)(side_it->first) << "\t strip: " << (int)((strip_it->second).strip) << "\t e: " << (int)((strip_it->second).energy) << std::endl;
+        /*for(int count = 0; count <6 ;count++){
+          std::cout << count << " " << det << " " << implant_hits[count][0].size() <<std::endl;
+        }*/
 
-	    if( (abs((strip_it->first - strip_prev)) > 1 && strip_prev != -999) || (side_prev != side_it->first && side_prev != -999) ) { //If end of cluser write to cluster map
-	      
-	      cluster_evt clust;
-	      clust.t      = t_min;
-	      clust.t_ext  = t_ext_min;
-	      if(side_prev == 0)      {clust.x = -1; clust.y = max_strip;}
-	      else if(side_prev == 1) {clust.x = max_strip; clust.y = -1;}
-	      clust.z      = det+1;
-	      clust.energy = cluster_e;
-	      clust.mult   = multi;
-	      clust.flag   = 10;
-		
-	      ++imp_entry;
-		
-	      implant_clusts[det].insert({side_prev,clust});
-	      
-	      //std::cout << "Side implant cluster identified in DSSD " << clust.z << " >> side: " << side_prev << "\t strip: " << max_strip << "\t mult: " << multi << "\t e: " << cluster_e  << "\t t: " << t_min << std::endl;
+        if( (abs(strip_it->first  - strip_prev) == 1 || strip_prev == -999) ){ //If first strip or neighbouring strips on same side, add to cluster
+          cluster_e += (strip_it->second).energy;
+          ++multi;
+    
+          if( (strip_it->second).energy > max_e)                     { max_e = (strip_it->second).energy; max_strip = (strip_it->second).strip;} //Max_e pos
+          if( (strip_it->second).t < t_min || t_min < 0)             { t_min = (strip_it->second).t;}                                            //Earliest tm_stmp in cluster
+          if( (strip_it->second).t_ext < t_ext_min || t_ext_min < 0) { t_ext_min = (strip_it->second).t_ext;}                                    //Earliest external tm_stmp in cluster
+          strip_prev = strip_it->first;
+          side_prev = hitSide;
+        } //End cluster building
 
-	      multi      = 1;    //
-	      cluster_e  = (strip_it->second).energy;    //
-	      max_e      = (strip_it->second).energy;    //
-	      max_strip  = strip_it->first;              // Reset cluster variables to
-	      strip_prev = strip_it->first;              // those of current hit event.
-	      side_prev  = side_it->first;               //
-	      t_min      = (strip_it->second).t;         //
-	      t_ext_min  = (strip_it->second).t_ext;     //	  
-	      
-	    } //End of cluster writing for side change or discontinuous strips firing
+        if( (abs((strip_it->first - strip_prev)) > 1) ) { //If end of cluser write to cluster map
+        
+          cluster_evt clust;
+          clust.t      = t_min;
+          clust.t_ext  = t_ext_min;
+          if(side_prev == 0)      {clust.x = -1; clust.y = max_strip;}
+          else if(side_prev == 1) {clust.x = max_strip; clust.y = -1;}
+          clust.z      = det+1;
+          clust.energy = cluster_e;
+          clust.mult   = multi;
+          clust.flag   = 10;
+    
 
-	    if( n_hits == implant_hits[det].size() ) {
-	      cluster_evt clust;
-	      clust.t      = t_min;
-	      clust.t_ext  = t_ext_min;
-	      if(side_prev == 0)      {clust.x = -1; clust.y = max_strip;}
-	      else if(side_prev == 1) {clust.x = max_strip; clust.y = -1;}
-	      clust.z      = det+1;
-	      clust.energy = cluster_e;
-	      clust.mult   = multi;
-	      clust.flag   = 10;
-		
-	      ++imp_entry;
-		
-	      implant_clusts[det].insert({side_prev,clust});
-	      
-	      if(b_histograms){
-		
-	      }
-	      
-	      //std::cout << "Side implant cluster identified in DSSD " << clust.z << " >> side: " << side_prev << "\t strip: " << max_strip << "\t mult: " << multi << "\t e: " << cluster_e <<"\t t: " << t_min << std::endl;
-	      //if(n_hits == implant_hits[det].size()) std::cout << "End of hits in this event!!! " << std::endl;
-	    } //End clustering on last event
+          ++imp_entry;
+    
+          implant_clusts[det].insert({side_prev,clust});
+        
+          //std::cout << "Side implant cluster identified in DSSD " << clust.z << " >> side: " << side_prev << "\t strip: " << max_strip << "\t mult: " << multi << "\t e: " << cluster_e  << "\t t: " << t_min << std::endl;
+
+          multi      = 1;    //
+          cluster_e  = (strip_it->second).energy;    //
+          max_e      = (strip_it->second).energy;    //
+          max_strip  = strip_it->first;              // Reset cluster variables to
+          strip_prev = strip_it->first;              // those of current hit event.
+          side_prev  = hitSide;               //
+          t_min      = (strip_it->second).t;         //
+          t_ext_min  = (strip_it->second).t_ext;     //   
+        } //End of cluster writing for side change or discontinuous strips firing
+
+        if( n_hits == implant_hits[det][hitSide].size() ) {
+          cluster_evt clust;
+          clust.t      = t_min;
+          clust.t_ext  = t_ext_min;
+          if(side_prev == 0)      {clust.x = -1; clust.y = max_strip;}
+          else if(side_prev == 1) {clust.x = max_strip; clust.y = -1;}
+          clust.z      = det+1;
+          clust.energy = cluster_e;
+          clust.mult   = multi;
+          clust.flag   = 10;
+    
+          ++imp_entry;
+    
+          implant_clusts[det].insert({side_prev,clust});
+        
+          //std::cout << "Side implant cluster identified in DSSD " << clust.z << " >> side: " << side_prev << "\t strip: " << max_strip << "\t mult: " << multi << "\t e: " << cluster_e <<"\t t: " << t_min << std::endl;
+          //if(n_hits == implant_hits[det].size()) std::cout << "End of hits in this event!!! " << std::endl;
+        } //End clustering on last event
+      }//End loop over side
 	  } //End clustering over this DSSD
 	} //End if events upstream
       } //End if events downstream
@@ -377,10 +377,10 @@ void Analysis::CloseEvent(){
   // ******************************************
   
   if(!b_implant){ //If not an implant event
-    if( (total_evt_mult[0][0] > 100 && total_evt_mult[1][0] > 100  && total_evt_mult[2][0] > 100  && total_evt_mult[3][0] > 100 && total_evt_mult[4][0] > 100 && total_evt_mult[5][0] > 100) 
+    if( (total_evt_mult[0][0] > 100 && /*total_evt_mult[1][0] > 100  &&*/ total_evt_mult[2][0] > 100  && total_evt_mult[3][0] > 100 && total_evt_mult[4][0] > 100 && total_evt_mult[5][0] > 100) 
 	|| 
-	(e_sum_d[0][0] > 5000 && e_sum_d[1][0] > 5000 && e_sum_d[2][0] > 5000 && e_sum_d[3][0] > 5000 && e_sum_d[3][0] > 5000 && e_sum_d[4][0] > 5000 && e_sum_d[5][0] > 5000) ) {
-      hEvt_pulserMult->Fill(total_evt_mult[0][0], total_evt_mult[0][1]);
+	(e_sum_d[0][0] > 5000 && /* e_sum_d[1][0] > 5000 && */e_sum_d[2][0] > 5000 && e_sum_d[3][0] > 5000 && e_sum_d[3][0] > 5000 && e_sum_d[4][0] > 5000 && e_sum_d[5][0] > 5000) ) {
+      if(GetBHistograms()){hEvt_pulserMult->Fill(total_evt_mult[0][0], total_evt_mult[0][1]);}
       ++puls_num;
       b_pulser = true;
     }
@@ -393,85 +393,87 @@ void Analysis::CloseEvent(){
   if(!b_pulser && !b_implant){    // If not a pulser or implant
     
     for(int det=0; det < common::N_DSSD; ++det) {  // Loop over detectors ( 0 -> common::N_DSSD )
-      int multi      = 0;        //Total number of strips in each cluster
-      int cluster_e  = 0;        //Total energy of each cluster
-      int max_e      = -999;     //Max individual strip energy
-      int max_strip  = -999;     //Stip with highest energy deposit
-      int strip_prev = -999;     //Previously processed strip
-      int side_prev  = -999;     //Previously processed side
-      Long64_t t_min = -999;     //Earliest timestamp for cluster strips
-      Long64_t t_ext_min = -999; //Earliest t_ext for cluster strips
-      int n_hits = 0;
-      //std::cout << "Size of DSSD" << det+1 << " map: " << decay_hits[det].size() << std::endl;
+      if ( decay_hits[det][0].size() > 0 && decay_hits[det][1].size() > 0){
+      for(int hitSide = 0 ; hitSide < 2 ; ++hitSide){
+        int multi      = 0;        //Total number of strips in each cluster
+        int cluster_e  = 0;        //Total energy of each cluster
+        int max_e      = -999;     //Max individual strip energy
+        int max_strip  = -999;     //Stip with highest energy deposit
+        int strip_prev = -999;     //Previously processed strip
+        int side_prev  = -999;     //Previously processed side
+        Long64_t t_min = -999;     //Earliest timestamp for cluster strips
+        Long64_t t_ext_min = -999; //Earliest t_ext for cluster strips
+        int n_hits = 0;
+        //std::cout << "Size of DSSD" << det+1 << " map: " << decay_hits[det].size() << std::endl;
       
-      for( side_it = decay_hits[det].begin(); side_it != decay_hits[det].end(); ++side_it ) {
+//      for( side_it = decay_hits[det].begin(); side_it != decay_hits[det].end(); ++side_it ) {
+          for( strip_it = decay_hits[det][hitSide].begin() ; strip_it != decay_hits[det][hitSide].end() ; ++strip_it){  
 
-	++n_hits;
-	strip_it = (side_it->second).begin();
-	//std::cout << "Decay n_hit " << n_hits << " >> det: " << (int)(strip_it->second).det << "\t side: " << (int)(side_it->first) << "\t strip: " << (int)((strip_it->second).strip) << "\t e: " << (int)((strip_it->second).energy) << std::endl;
-	
-	if( (abs(strip_it->first  - strip_prev) == 1 || strip_prev == -999) && (side_it->first == side_prev || side_prev == -999) ){ //If first strip or neighbouring strips on same side, add to cluster
-	  cluster_e += (strip_it->second).energy;
-	  ++multi;
-	  
-	  if( (strip_it->second).energy > max_e)                     { max_e = (strip_it->second).energy; max_strip = (strip_it->second).strip;} //Max_e pos
-	  if( (strip_it->second).t < t_min || t_min < 0)             { t_min = (strip_it->second).t;}                                            //Earliest tm_stmp in cluster
-	  if( (strip_it->second).t_ext < t_ext_min || t_ext_min < 0) { t_ext_min = (strip_it->second).t_ext;}                                    //Earliest external tm_stmp in cluster
-	  strip_prev = strip_it->first;
-	  side_prev = side_it->first;
-	  
-	} //End cluster building
-	
-	if( (abs((strip_it->first - strip_prev)) > 1 && strip_prev != -999) || (side_prev != side_it->first && side_prev != -999) ) { //If end of cluser write to cluster map
-	  //if(multi<7) {  //If cluster has mulitplicity below 7 -> write it
-	  cluster_evt clust;
-	  clust.t      = t_min;
-	  clust.t_ext  = t_ext_min;
-	  if(side_prev == 0)      {clust.x = -1; clust.y = max_strip;}
-	  else if(side_prev == 1) {clust.x = max_strip; clust.y = -1;}
-	  clust.z      = det+1;
-	  clust.energy = cluster_e;
-	  clust.mult   = multi;
-	  clust.flag   = 1;
-	  
-	  ++dec_hits;
-	  
-	  decay_clusts[det].insert({side_prev,clust});
-	  hEvt_Mult_d[det][side_prev]->Fill(multi);
-	  //}   //Otherwise reset variables for next cluster build.
-	//std::cout << "Side decay cluster identified in DSSD " << clust.z << " >> side: " << side_prev << "\t strip: " << max_strip << "\t mult: " << multi << "\t e: " << cluster_e  << "\t t: " << t_min << std::endl;
-	
-	  multi      = 1;    //
-	  cluster_e  = (strip_it->second).energy;    //
-	  max_e      = (strip_it->second).energy;    //
-	  max_strip  = strip_it->first;              // Reset cluster variables to
-	  strip_prev = strip_it->first;              // those of current hit event.
-	  side_prev  = side_it->first;               //
-	  t_min      = (strip_it->second).t;         //
-	  t_ext_min  = (strip_it->second).t_ext;     //	
+            ++n_hits;
+            //std::cout << "Decay n_hit " << n_hits << " >> det: " << (int)(strip_it->second).det << "\t side: " << (int)(side_it->first) << "\t strip: " << (int)((strip_it->second).strip) << "\t e: " << (int)((strip_it->second).energy) << std::endl;
+            //std::cout << det <<"det nhits"<<n_hits << " Hello side " << side_prev << " Side now " << hitSide << " strip prev " << strip_prev << " new strip " << (strip_it->first) <<std::endl; 
 
-	 
-	} //End of cluster writing for side change or discontinuous strips firing
-	
-	if( n_hits == decay_hits[det].size() /*&& multi < 7*/ ) {
-	  cluster_evt clust;
-	  clust.t      = t_min;
-	  clust.t_ext  = t_ext_min;
-	  if(side_prev == 0)      {clust.x = -1; clust.y = max_strip;}
-	  else if(side_prev == 1) {clust.x = max_strip; clust.y = -1;}
-	  clust.z      = det+1;
-	  clust.energy = cluster_e;
-	  clust.mult   = multi;
-	  clust.flag   = 1;
-	  
-	  ++dec_hits;
-	  
-	  decay_clusts[det].insert({side_prev,clust});
-	  hEvt_Mult_d[det][side_prev]->Fill(multi);	  
-	  //std::cout << "End of size decay cluster identified in DSSD " << clust.z << " >> side: " << side_prev << "\t strip: " << max_strip << "\t mult: " << multi << "\t e: " << cluster_e <<"\t t: " << t_min << std::endl;
-	  
-	} //End clustering on last event
-      } //End clustering over this side
+            if( (abs(strip_it->first  - strip_prev) == 1 || strip_prev == -999) ){ //If first strip or neighbouring strips on same side, add to cluster
+              cluster_e += (strip_it->second).energy;
+              ++multi;
+              
+              if( (strip_it->second).energy > max_e)                     { max_e = (strip_it->second).energy; max_strip = (strip_it->second).strip;} //Max_e pos
+              if( (strip_it->second).t < t_min || t_min < 0)             { t_min = (strip_it->second).t;}                                            //Earliest tm_stmp in cluster
+              if( (strip_it->second).t_ext < t_ext_min || t_ext_min < 0) { t_ext_min = (strip_it->second).t_ext;}                                    //Earliest external tm_stmp in cluster
+              strip_prev = strip_it->first;
+              side_prev = hitSide;            
+            } //End cluster building  
+            else if( (abs((strip_it->first - strip_prev)) > 1) ) { //If end of cluser write to cluster map
+              //if(multi<7) {  //If cluster has mulitplicity below 7 -> write it
+              cluster_evt clust;
+              clust.t      = t_min;
+              clust.t_ext  = t_ext_min;
+              if(side_prev == 0)      {clust.x = -1; clust.y = max_strip;}
+              else if(side_prev == 1) {clust.x = max_strip; clust.y = -1;}
+              clust.z      = det+1;
+              clust.energy = cluster_e;
+              clust.mult   = decay_hits[det][hitSide].size();//multi;
+              clust.flag   = 1;           
+
+                
+              ++dec_hits;
+                
+              decay_clusts[det].insert({side_prev,clust});
+              if(GetBHistograms()){hEvt_Mult_d[det][side_prev]->Fill(multi);}
+              //}   //Otherwise reset variables for next cluster build.
+              //std::cout << "Side decay cluster identified in DSSD " << clust.z << " >> side: " << side_prev << "\t strip: " << max_strip << "\t mult: " << multi << "\t e: " << cluster_e  << "\t t: " << t_min << std::endl;
+              
+              multi      = 1;    //
+              cluster_e  = (strip_it->second).energy;    //
+              max_e      = (strip_it->second).energy;    //
+              max_strip  = strip_it->first;              // Reset cluster variables to
+              strip_prev = strip_it->first;              // those of current hit event.
+              side_prev  = hitSide;               //
+              t_min      = (strip_it->second).t;         //
+              t_ext_min  = (strip_it->second).t_ext;     //                  
+            } //End of cluster writing for side change or discontinuous strips firing 
+
+            if( n_hits == decay_hits[det][hitSide].size() /*&& multi < 7*/ ) {
+              cluster_evt clust;
+              clust.t      = t_min;
+              clust.t_ext  = t_ext_min;
+              if(side_prev == 0)      {clust.x = -1; clust.y = max_strip;}
+              else if(side_prev == 1) {clust.x = max_strip; clust.y = -1;}
+              clust.z      = det+1;
+              clust.energy = cluster_e;
+              clust.mult   = decay_hits[det][hitSide].size();//multi;
+              clust.flag   = 1;
+                
+              ++dec_hits;
+                
+              decay_clusts[det].insert({side_prev,clust});
+              //hEvt_Mult_d[det][side_prev]->Fill(multi);   
+              //std::cout << "End of size decay cluster identified in DSSD " << clust.z << " >> side: " << side_prev << "\t strip: " << max_strip << "\t mult: " << multi << "\t e: " << cluster_e <<"\t t: " << t_min << std::endl;
+                
+            } //End clustering on last event
+          }//End looping these strips
+        }//End clustering this side
+      } //If events in this det
     } //End clustering over this DSSD
   } //End if not pulser or implant event
 
@@ -488,7 +490,7 @@ void Analysis::CloseEvent(){
 	  hEvt_MultXY_d[det][0]->Fill((x_clusts->second).mult, (y_clusts->second).mult );
 	  hEvt_residualE_d->Fill( (x_clusts->second).energy - (y_clusts->second).energy );
 	}
-	if( (y_clusts->second).energy > ((x_clusts->second).energy - 60) && (y_clusts->second).energy < ((x_clusts->second).energy + 60)) {
+	if( (y_clusts->second).energy > ((x_clusts->second).energy - 140) && (y_clusts->second).energy < ((x_clusts->second).energy + 140)) {
 	  if(b_histograms) {
 	    hEvt_Eside_d[det][0]->Fill((y_clusts->second).energy);
 	    hEvt_Eside_d[det][1]->Fill((x_clusts->second).energy);
@@ -515,7 +517,7 @@ void Analysis::CloseEvent(){
 	  ++dec_num;
 	  b_decay = true;
 	  //std::cout << "Decay pair -> det: " << det+1 << "\t x/y: " << (x_clusts->second).x << "/" << (y_clusts->second).y << "\t ex/ey: " << (x_clusts->second).energy << "/" << (y_clusts->second).energy << "\t t: " << evt.t << std::endl;
-	}
+	     }
       }
     }
   }
@@ -1792,11 +1794,18 @@ void Analysis::ResetEvent(){
     
     total_evt_mult[i][0] = 0;
     total_evt_mult[i][1] = 0;
+
+    //std::cout << implant_hits[i][0].size() << " first side det " << i << " backside " << implant_hits[i][1].size() <<std::endl;
     
-    decay_hits[i].clear();
-    implant_hits[i].clear();
+    decay_hits[i][0].clear();
+    implant_hits[i][0].clear();
+    decay_hits[i][1].clear();
+    implant_hits[i][1].clear();
     decay_clusts[i].clear();
     implant_clusts[i].clear();
+
+    //std::cout << implant_hits[i][0].size() << " first side det " << i << " backside " << implant_hits[i][1].size() <<std::endl;
+
     
     e_sum_d[i][0] = 0;
     e_sum_d[i][1] = 0;

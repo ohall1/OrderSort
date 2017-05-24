@@ -217,15 +217,16 @@ class Analysis{
   };
   root_evt hit;
     
-  typedef std::multimap<int, std::multimap<int, dssd_evt> > Hit_array;  ///< Multimap typedef to hold dssd_hits. [DSSD]<side, <strip, evt_info> >
-  Hit_array decay_hits[common::N_DSSD];            ///< Array to contain decay events in each detector
-  Hit_array implant_hits[common::N_DSSD];          ///< Array to contain decay events in each detector
+  //typedef std::multimap<int, std::multimap<int, dssd_evt> > Hit_array;  ///< Multimap typedef to hold dssd_hits. [DSSD]<side, <strip, evt_info> >
+  typedef std::multimap<int, dssd_evt> Hit_array;     ///< Updated as the arrays are now 2D to account for sides.
+  Hit_array decay_hits[common::N_DSSD][2];            ///< Array to contain decay events in each detector. Two dimensions one for front and one for back.
+  Hit_array implant_hits[common::N_DSSD][2];          ///< Array to contain decay events in each detector. Tow dimensions one for front and one for back.
 
   typedef std::multimap<int, cluster_evt> Clust_array;  ///< Multimap typedef to hold event clusters. [DSSD]<side, cluster_info>
   Clust_array decay_clusts[common::N_DSSD];
   Clust_array implant_clusts[common::N_DSSD];
 
-  Hit_array::iterator side_it;                     ///< Iterator for Hit_array. Loops over side.
+  //Hit_array::iterator side_it;                     ///< Iterator for Hit_array. Loops over side.
   std::multimap<int, dssd_evt>::iterator strip_it; ///< Iterator for Hit_array internal array. Loops over strips.
 
   typedef std::multimap<Long64_t, dssd_hit> Event_array;     ///< Multimap typedef to hold identified events. [DSSD]<timestamp, cluster_evt>
