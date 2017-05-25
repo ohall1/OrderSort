@@ -210,10 +210,10 @@ void Analysis::CloseEvent(){
     b_evt_up = true;
   
     //Check detector has events and no downstream events
-    if( implant_hits[det][0].size() > 0 && implant_hits[det][1].size() > 0 ) {
+    if( implant_hits[det][0].size() > 0 || implant_hits[det][1].size() > 0 ) {
       //std::cout << "    **** " << implant_hits[det].size() << " new implant events in DSSD " << det+1 << " ****" << std::endl;
       for (int down_det = det+1; down_det < common::N_DSSD; ++down_det) {
-	      if ( implant_hits[down_det][0].size() > 0 && implant_hits[down_det][1].size() > 0 ) {
+	      if ( implant_hits[down_det][0].size() > 0 || implant_hits[down_det][1].size() > 0 ) {
 	          b_evt_down = true;
 	          break;
         }
@@ -223,7 +223,7 @@ void Analysis::CloseEvent(){
       if (!b_evt_down) {
 	      ++imp_down;
 	      for (int up_det = 0; up_det < det; up_det++) {
-	        if( implant_hits[up_det][0].size() < 1 && implant_hits[up_det][0].size() < 1) {
+	        if( implant_hits[up_det][0].size() < 1 || implant_hits[up_det][0].size() < 1) {
 	          b_evt_up = false;
 	          break;
 	        }
@@ -569,7 +569,7 @@ void Analysis::CloseEvent(){
     root_dec.T = ((it->second).t + tmStpCorrOffeset)*10;
     root_dec.ID = 5; // ID 4 defines implant 5 defines decay
     hit = root_dec;
-	  if(tmStpCorrOffeset != 0){
+	  if(tmStpCorrOffeset != 0 && root_dec.ny < 10 && root_dec.nz <10){
 	   out_root_tree->Fill();
     }
 	}
