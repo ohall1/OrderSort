@@ -223,7 +223,7 @@ void Analysis::CloseEvent(){
       if (!b_evt_down) {
 	      ++imp_down;
 	      for (int up_det = 0; up_det < det; up_det++) {
-	        if( implant_hits[up_det][0].size() < 1 || implant_hits[up_det][0].size() < 1) {
+	        if( implant_hits[up_det][0].size() < 1 && implant_hits[up_det][1].size() < 1) {
 	          b_evt_up = false;
 	          break;
 	        }
