@@ -80,7 +80,8 @@ class Analysis{
   int dX_d_lim;                            ///< Max strip deviation in decay particle passing between....
   int E_i_min;                             ///< Minimum energy of implant event
   int E_d_min;                             ///< Minimum energy of decay event
-  int E_d_max;                             ///< Maximum energy of decay event     
+  int E_d_max;                             ///< Maximum energy of decay event
+  int implantMaxZ;                         ///< Highest detector with an implant per event     
 
   // double t0_i, t0_d;
 

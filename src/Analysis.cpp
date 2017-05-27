@@ -281,6 +281,10 @@ void Analysis::CloseEvent(){
           clust.energy = cluster_e;
           clust.mult   = multi;
           clust.flag   = 10;
+
+          if (clust.z > implantMaxZ){
+            implantMaxZ = clust.z;
+          }
     
 
           ++imp_entry;
@@ -309,6 +313,10 @@ void Analysis::CloseEvent(){
           clust.energy = cluster_e;
           clust.mult   = multi;
           clust.flag   = 10;
+
+          if (clust.z > implantMaxZ){
+            implantMaxZ = clust.z;
+          }
     
           ++imp_entry;
     
@@ -569,7 +577,7 @@ void Analysis::CloseEvent(){
     root_dec.T = ((it->second).t + tmStpCorrOffeset)*10;
     root_dec.ID = 5; // ID 4 defines implant 5 defines decay
     hit = root_dec;
-	  if(tmStpCorrOffeset != 0 && root_dec.ny < 10 && root_dec.nz <10){
+	  if(tmStpCorrOffeset != 0 && root_dec.ny < 10 && root_dec.nz <10 && root_dec.z > implantMaxZ){
 	   out_root_tree->Fill();
     }
 	}
@@ -584,6 +592,8 @@ void Analysis::CloseEvent(){
 void Analysis::InitEvent(Calibrator & my_cal_data){
     
   ResetEvent();
+
+  implantMaxZ = 0;
 
   //check again just in case we're trying to initialize with wrong data
   if(/*!my_cal_data.GetADCrange() || */!IsChEnabled(my_cal_data)){
