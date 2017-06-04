@@ -146,6 +146,10 @@ bool Analysis::BuildEvent(Calibrator & my_cal_data){
 
      e_sum_d[cal.GetDSSD()-1][cal.GetADCrange()] += cal.GetADCenergy();
      ++total_evt_mult[cal.GetDSSD()-1][cal.GetADCrange()];
+
+     if(imp_evt.det > implantMaxZ){
+      implantMaxZ = imp_evt.det;
+     }
    }
  }
 
@@ -282,9 +286,9 @@ void Analysis::CloseEvent(){
           clust.mult   = multi;
           clust.flag   = 10;
 
-          if (clust.z > implantMaxZ){
+          /*if (clust.z > implantMaxZ){
             implantMaxZ = clust.z;
-          }
+          }*/
     
 
           ++imp_entry;
