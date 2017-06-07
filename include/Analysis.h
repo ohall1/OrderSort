@@ -201,7 +201,7 @@ class Analysis{
 
   struct root_evt{
   root_evt():T(0),Tfast(0),E(0),Ex(0),Ey(0),x(0),y(0),z(0),nx(0),ny(0),nz(0),ID(8){}
-  root_evt(dssd_hit evt):T(ULong_t(evt.t)),Tfast(ULong_t(evt.t_ext)),E(Double_t(evt.ex + evt.ey)),
+  root_evt(dssd_hit evt):T(ULong_t(evt.t)),Tfast(ULong_t(evt.t_ext)),E(Double_t((evt.ex + evt.ey)/2.0)),
     Ex(Double_t(evt.ex)),Ey(Double_t(evt.ey)),x(Double_t(evt.x)),y(Double_t(evt.y)),z(Double_t(evt.z)),nx(evt.nx),ny(evt.ny),nz(1),ID(8){}
   ULong_t T;
   ULong_t Tfast;
