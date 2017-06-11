@@ -389,7 +389,8 @@ void Analysis::CloseEvent(){
   // ******************************************
   
   if(!b_implant){ //If not an implant event
-    if( (total_evt_mult[0][0] > 100 && /*total_evt_mult[1][0] > 100  &&*/ total_evt_mult[2][0] > 100  && total_evt_mult[3][0] > 100 && total_evt_mult[4][0] > 100 && total_evt_mult[5][0] > 100) 
+    if( ((total_evt_mult[0][0] + total_evt_mult[1][0] + total_evt_mult[2][0] + total_evt_mult[3][0] + total_evt_mult[4][0] + total_evt_mult[5][0] +
+      total_evt_mult[0][1] + total_evt_mult[1][1] + total_evt_mult[2][1] + total_evt_mult[3][1] + total_evt_mult[4][1] + total_evt_mult[5][1])>1000) 
 	|| 
 	(e_sum_d[0][0] > 5000 && /* e_sum_d[1][0] > 5000 && */e_sum_d[2][0] > 5000 && e_sum_d[3][0] > 5000 && e_sum_d[3][0] > 5000 && e_sum_d[4][0] > 5000 && e_sum_d[5][0] > 5000) ) {
       if(GetBHistograms()){hEvt_pulserMult->Fill(total_evt_mult[0][0], total_evt_mult[0][1]);}
@@ -502,7 +503,7 @@ void Analysis::CloseEvent(){
 	  hEvt_MultXY_d[det][0]->Fill((x_clusts->second).mult, (y_clusts->second).mult );
 	  hEvt_residualE_d->Fill( (x_clusts->second).energy - (y_clusts->second).energy );
 	}
-	if( (y_clusts->second).energy > ((x_clusts->second).energy - 140) && (y_clusts->second).energy < ((x_clusts->second).energy + 140)) {
+	if( (y_clusts->second).energy > ((x_clusts->second).energy - 100) && (y_clusts->second).energy < ((x_clusts->second).energy + 100)) {
 	  if(b_histograms) {
 	    hEvt_Eside_d[det][0]->Fill((y_clusts->second).energy);
 	    hEvt_Eside_d[det][1]->Fill((x_clusts->second).energy);
@@ -581,7 +582,7 @@ void Analysis::CloseEvent(){
     root_dec.T = ((it->second).t + tmStpCorrOffeset)*10;
     root_dec.ID = 5; // ID 4 defines implant 5 defines decay
     hit = root_dec;
-	  if(tmStpCorrOffeset != 0 && root_dec.ny < 10 && root_dec.nz <10 && root_dec.z > implantMaxZ){
+	  if(tmStpCorrOffeset != 0 && root_dec.ny < 10 && root_dec.nz <10 && implantMaxZ < root_dec.z){
 	   out_root_tree->Fill();
     }
 	}
