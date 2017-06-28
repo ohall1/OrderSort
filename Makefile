@@ -38,7 +38,7 @@ LDFLAGS 	+= $(ROOTLDFLAGS) $(ROOTLIBS)
 ifeq '$(HOST)' 'vorbis.ph.ed.ac.uk'
 	INCLUDES=  -I/Disk/ds-sopa-group/np/RIKEN/AIDAsort/DataXferLib/V4_TCP -I/Disk/ds-sopa-group/np/RIKEN/AIDAsort/DataSpyLib
 	LDLIBS=   -L/usr/ucblib -lrt -lpthread -L/home/s1668713/Documents/Code/AIDALib/MIDAS/Linux/lib64 -lxfer -ldataspy
-	COMP= $($(CC) $(LDFLAGS) $(LDLIBS) -o $@ $^)
+	COMP= ($(CC) $(LDFLAGS) $(LDLIBS) -o $@ $^)
 else
 	INCLUDES=  -I/mnt/c/Users/oscar/Linux/Code/AIDA/AIDALib/DataXferLib/V4_TCP -I/mnt/c/Users/oscar/Linux/Code/AIDA/AIDALib/DataSpyLib
 	LDLIBS=   -L/usr/ucblib -lrt -lpthread -L/mnt/c/Users/oscar/Linux/Code/AIDA/AIDALib/MIDAS/Linux/lib64 -lxfer -ldataspy

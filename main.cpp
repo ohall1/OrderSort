@@ -80,8 +80,8 @@ int main  (int argc, char **argv){
 
   bool b_Xfer= false;
 
-  std::string DataDir = "../../Order_Sort/data/";  //"/home/data/rootFiles/";// Input data directory.
-  std::string OutDir = "../../Order_Sort/data/";  //"/home/data/rootFiles/"; 
+  std::string DataDir = "/scratch/ohall/AIDA/data/RIBF128/AIDA/Raw/";  //"/home/data/rootFiles/";// Input data directory.
+  std::string OutDir = "/scratch/ohall/AIDA/data/RIBF128/AIDA/root/";  //"/home/data/rootFiles/"; 
 
   bool b_root_file= false;
 

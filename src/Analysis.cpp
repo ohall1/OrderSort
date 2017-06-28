@@ -214,10 +214,10 @@ void Analysis::CloseEvent(){
     b_evt_up = true;
   
     //Check detector has events and no downstream events
-    if( implant_hits[det][0].size() > 0 || implant_hits[det][1].size() > 0 ) {
+    if( implant_hits[det][0].size() > 0 && implant_hits[det][1].size() > 0 ) {
       //std::cout << "    **** " << implant_hits[det].size() << " new implant events in DSSD " << det+1 << " ****" << std::endl;
       for (int down_det = det+1; down_det < common::N_DSSD; ++down_det) {
-	      if ( implant_hits[down_det][0].size() > 0 || implant_hits[down_det][1].size() > 0 ) {
+	      if ( implant_hits[down_det][0].size() > 0 && implant_hits[down_det][1].size() > 0 ) {
 	          b_evt_down = true;
 	          break;
         }
