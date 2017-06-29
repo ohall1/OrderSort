@@ -173,7 +173,7 @@ int main  (int argc, char **argv){
 	case 'v':
 	  b_verbose = true;
 	  break;
-
+ 
 	default:
 	  Usage(argv[0]);
 	  break;

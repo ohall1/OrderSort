@@ -217,7 +217,7 @@ void Analysis::CloseEvent(){
     if( implant_hits[det][0].size() > 0 && implant_hits[det][1].size() > 0 ) {
       //std::cout << "    **** " << implant_hits[det].size() << " new implant events in DSSD " << det+1 << " ****" << std::endl;
       for (int down_det = det+1; down_det < common::N_DSSD; ++down_det) {
-	      if ( implant_hits[down_det][0].size() > 0 && implant_hits[down_det][1].size() > 0 ) {
+	      if ( implant_hits[down_det][0].size() > 0 || implant_hits[down_det][1].size() > 0 ) {
 	          b_evt_down = true;
 	          break;
         }
@@ -227,7 +227,7 @@ void Analysis::CloseEvent(){
       if (!b_evt_down) {
 	      ++imp_down;
 	      for (int up_det = 0; up_det < det; up_det++) {
-	        if( implant_hits[up_det][0].size() < 1 && implant_hits[up_det][1].size() < 1) {
+	        if( implant_hits[up_det][0].size() < 1 || implant_hits[up_det][1].size() < 1) {
 	          b_evt_up = false;
 	          break;
 	        }
@@ -235,7 +235,7 @@ void Analysis::CloseEvent(){
 
 		
 	//If no events downstream and events in all upstream dets, make clusters in final DSSD.
-	if(b_evt_up || det == 0) {
+	if((b_evt_up || det == 0) && !b_evt_down) {
 	  ++imp_up;
 
 
@@ -391,9 +391,9 @@ void Analysis::CloseEvent(){
   
   if(!b_implant){ //If not an implant event
     if( ((total_evt_mult[0][0] + total_evt_mult[1][0] + total_evt_mult[2][0] + total_evt_mult[3][0] + total_evt_mult[4][0] + total_evt_mult[5][0] +
-      total_evt_mult[0][1] + total_evt_mult[1][1] + total_evt_mult[2][1] + total_evt_mult[3][1] + total_evt_mult[4][1] + total_evt_mult[5][1])>1000) 
-	|| 
-	(e_sum_d[0][0] > 5000 && /* e_sum_d[1][0] > 5000 && */e_sum_d[2][0] > 5000 && e_sum_d[3][0] > 5000 && e_sum_d[3][0] > 5000 && e_sum_d[4][0] > 5000 && e_sum_d[5][0] > 5000) ) {
+      total_evt_mult[0][1] + total_evt_mult[1][1] + total_evt_mult[2][1] + total_evt_mult[3][1] + total_evt_mult[4][1] + total_evt_mult[5][1])>800) 
+	/*|| 
+	(e_sum_d[0][0] > 5000 &&  e_sum_d[1][0] > 5000 && e_sum_d[2][0] > 5000 && e_sum_d[3][0] > 5000 && e_sum_d[3][0] > 5000 && e_sum_d[4][0] > 5000 && e_sum_d[5][0] > 5000)*/ ) {
       if(GetBHistograms()){hEvt_pulserMult->Fill(total_evt_mult[0][0], total_evt_mult[0][1]);}
       ++puls_num;
       b_pulser = true;
@@ -584,7 +584,7 @@ void Analysis::CloseEvent(){
     root_dec.T = ((it->second).t + tmStpCorrOffeset)*10;
     root_dec.ID = 5; // ID 4 defines implant 5 defines decay
     hit = root_dec;
-	  if(tmStpCorrOffeset != 0 && root_dec.ny < 10 && root_dec.nz <10 && implantMaxZ < root_dec.z){
+	  if(tmStpCorrOffeset != 0 /* && root_dec.ny < 10 && root_dec.nx <10 && implantMaxZ < 1*/){
 	   out_root_tree->Fill();
     }
 	}
