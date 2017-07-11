@@ -93,6 +93,8 @@ class Analysis{
   double e_sum_d[common::N_DSSD][2];       ///< Total energy deposited during decay event
   double e_sum[common::N_DSSD][2];
 
+  int evtPerASIC[common::N_FEE64][4];      ///< Number of events per ASIC in an event window
+
 
   //-----------------------------------------------
   //   END PARAMETERS

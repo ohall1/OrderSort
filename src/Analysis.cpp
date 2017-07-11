@@ -103,6 +103,12 @@ bool Analysis::BuildEvent(Calibrator & my_cal_data){
 
   t_aida_prev = my_cal_data.GetTimeAIDA();
   evt_data.dt = my_cal_data.GetTimeAIDA() - evt_data.t0; //assume monotonically increasing tm-stps
+
+  //Corrections for multiplexer output offsetting time by 2.5us
+  int ASIC = my_cal_data.GetChannel()/16;
+  my_cal_data.SetTimeAIDA(t_aida_prev - (evtPerASIC[my_cal_data.GetModule()-1][ASIC]*2000));
+  evtPerASIC[my_cal_data.GetModule()-1][ASIC] +=1;
+
   if( (int)my_cal_data.GetADCrange() == 1 )        {BuildImplant(my_cal_data); ++implant_words;}
   else if( (int)my_cal_data.GetADCrange() == 0 )   {BuildDecay(my_cal_data); ++decay_words;}
 
@@ -584,7 +590,7 @@ void Analysis::CloseEvent(){
     root_dec.T = ((it->second).t + tmStpCorrOffeset)*10;
     root_dec.ID = 5; // ID 4 defines implant 5 defines decay
     hit = root_dec;
-	  if(tmStpCorrOffeset != 0 /* && root_dec.ny < 10 && root_dec.nx <10 && implantMaxZ < 1*/){
+	  if(tmStpCorrOffeset != 0  && root_dec.ny < 10 && root_dec.nx <10 && implantMaxZ < 1){
 	   out_root_tree->Fill();
     }
 	}
@@ -1806,6 +1812,12 @@ void Analysis::ResetEvent(){
   hit.ex    = -1;
   hit.ey    = -1;
   hit.flag  = -1;*/
+
+  for(int i = 0; i<common::N_FEE64; i++){
+    for (int j = 0; j < 4; j++){
+      evtPerASIC[i][j]=0;
+    }
+  }
 
   for(int i=0; i<common::N_DSSD; i++){
     
