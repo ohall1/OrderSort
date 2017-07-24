@@ -104,9 +104,9 @@ bool Analysis::BuildEvent(Calibrator & my_cal_data){
   t_aida_prev = my_cal_data.GetTimeAIDA();
   evt_data.dt = my_cal_data.GetTimeAIDA() - evt_data.t0; //assume monotonically increasing tm-stps
 
-  //Corrections for multiplexer output offsetting time by 2.5us
+  //Corrections for multiplexer output offsetting time by 2us
   int ASIC = my_cal_data.GetChannel()/16;
-  my_cal_data.SetTimeAIDA(t_aida_prev - (evtPerASIC[my_cal_data.GetModule()-1][ASIC]*2000));
+  my_cal_data.SetTimeAIDA(t_aida_prev - (evtPerASIC[my_cal_data.GetModule()-1][ASIC]*200));
   evtPerASIC[my_cal_data.GetModule()-1][ASIC] +=1;
 
   if( (int)my_cal_data.GetADCrange() == 1 )        {BuildImplant(my_cal_data); ++implant_words;}
@@ -511,7 +511,7 @@ void Analysis::CloseEvent(){
 	  hEvt_residualE_d->Fill( (x_clusts->second).energy - (y_clusts->second).energy );
 	}
 	//if( (y_clusts->second).energy > ((x_clusts->second).energy - 100) && (y_clusts->second).energy < ((x_clusts->second).energy + 100)) {
-  if( abs( (y_clusts->second).energy - (x_clusts->second).energy) < 100){
+  if( abs( (y_clusts->second).energy - (x_clusts->second).energy) < 60){
 	  if(b_histograms) {
 	    hEvt_Eside_d[det][0]->Fill((y_clusts->second).energy);
 	    hEvt_Eside_d[det][1]->Fill((x_clusts->second).energy);
@@ -2341,7 +2341,7 @@ Analysis::Analysis(){
     total_evt_mult[i][0] = 0;
     total_evt_mult[i][1] = 0;
   }
-  event_time_window = 2500;
+  event_time_window = 250;
   dE_i_lim= 2000;
   dX_i_lim= 15;
   E_i_min= 300;
