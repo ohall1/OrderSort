@@ -35,15 +35,15 @@ LDFLAGS 	+= $(ROOTLDFLAGS) $(ROOTLIBS)
 #INCLUDES=  -I/MIDAS/DataPackage/DataXferLib/V4_TCP -I/MIDAS/DataPackage/DataSpyLib #!!! on aidas1 !!!
 #LDLIBS=   -L/usr/ucblib -lrt -lpthread -L/MIDAS/Linux/lib64 -lxfer -ldataspy #!!! on aidas1 !!!
 
-#ifeq '$(HOST)' 'vorbis.ph.ed.ac.uk'
+ifeq '$(HOST)' 'vorbis.ph.ed.ac.uk'
 	INCLUDES=  -I/Disk/ds-sopa-group/np/RIKEN/AIDAsort/DataXferLib/V4_TCP -I/Disk/ds-sopa-group/np/RIKEN/AIDAsort/DataSpyLib
 	LDLIBS=   -L/usr/ucblib -lrt -lpthread -L/Disk/ds-sopa-group/np/RIKEN/AIDAsort/MIDAS/Linux/lib64 -lxfer -ldataspy
-#	COMP= ($(CC) $(LDFLAGS) $(LDLIBS) -o $@ $^)
-#else
-#	INCLUDES=  -I/mnt/c/Users/oscar/Linux/Code/AIDA/AIDALib/DataXferLib/V4_TCP -I/mnt/c/Users/oscar/Linux/Code/AIDA/AIDALib/DataSpyLib
-#	LDLIBS=   -L/usr/ucblib -lrt -lpthread -L/mnt/c/Users/oscar/Linux/Code/AIDA/AIDALib/MIDAS/Linux/lib64 -lxfer -ldataspy
-#	COMP= ($(CC) -o $@ $^ $(LDLIBS) $(LDFLAGS))
-#endif
+	COMP= ($(CC) $(LDFLAGS) $(LDLIBS) -o $@ $^)
+else
+	INCLUDES=  -I/mnt/c/Users/oscar/Linux/Code/AIDA/AIDALib/DataXferLib/V4_TCP -I/mnt/c/Users/oscar/Linux/Code/AIDA/AIDALib/DataSpyLib
+	LDLIBS=   -L/usr/ucblib -lrt -lpthread -L/mnt/c/Users/oscar/Linux/Code/AIDA/AIDALib/MIDAS/Linux/lib64 -lxfer -ldataspy
+	COMP= ($(CC) -o $@ $^ $(LDLIBS) $(LDFLAGS))
+endif
 
 
 # The object files.
@@ -54,8 +54,8 @@ vpath %.cpp ./src
 vpath %.h ./include
 
 AIDAsort-v2cg.exe : main.o $(OBJECTS)
-	$(CC) $(LDFLAGS) $(LDLIBS) -o $@ $^
-#	$(COMP)
+#	$(CC) $(LDFLAGS) $(LDLIBS) -o $@ $^
+	$(COMP)
 #	$(CC) -o $@ $^ $(LDLIBS) $(LDFLAGS)
 main.o : main.cpp
 	$(CC) $(CFLAGS) $(INCLUDES) -Iinclude/ $^
