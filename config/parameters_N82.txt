@@ -1,7 +1,7 @@
 #map fee64 -> DSSD: map_dssd <FEE> <DSSD no.>
 #-1 mean FEE not used. 0 means....
-map_dssd  1  5
-map_dssd  2  6
+map_dssd  1  1
+map_dssd  2  2
 map_dssd  3  6
 map_dssd  4  5
 map_dssd  5  6
@@ -16,8 +16,8 @@ map_dssd  13  4
 map_dssd  14  3
 map_dssd  15  3
 map_dssd  16  4
-map_dssd  17  1
-map_dssd  18  2
+map_dssd  17  5
+map_dssd  18  6
 map_dssd  19  2
 map_dssd  20  1
 map_dssd  21  2

@@ -110,7 +110,7 @@ void Calibrator::Process(Unpacker & my_unp_data){
       CalibrateADC(); //energy... range...
 
       //time discriminator set after calculation of time-stamp
-      if( GetBEnabled() && (double)GetADCenergy() > 150) SetBPushData(true); //std::cout << "Calibrator ADC at t:   " << my_unp_data.GetTmStp() << std::endl;}//if not a dissabled chanel (e.g. noisy ch)
+      if( GetBEnabled() && (double)GetADCenergy() > 0) SetBPushData(true); //std::cout << "Calibrator ADC at t:   " << my_unp_data.GetTmStp() << std::endl;}//if not a dissabled chanel (e.g. noisy ch)
 
       SetBFillTree(true);
     }

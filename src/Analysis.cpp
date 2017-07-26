@@ -381,6 +381,7 @@ void Analysis::CloseEvent(){
     }
     else{
       evt.t = 0; evt.t_ext = 0;
+
     }
 	  implant_evts.insert({evt.t,evt});
 	  ++imp_num;
@@ -2344,11 +2345,11 @@ Analysis::Analysis(){
   event_time_window = 250;
   dE_i_lim= 2000;
   dX_i_lim= 15;
-  E_i_min= 300;
+  E_i_min= 0;
 
   dE_d_lim= 3000;
   dX_d_lim= 5;
-  E_d_min= 150;
+  E_d_min= 0;
   E_d_max= 3000;
 
   evt_data.multiplicity= 0;
