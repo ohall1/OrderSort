@@ -286,6 +286,13 @@ class Analysis{
   TH1I * hEvt_TmStpDist;                    ///< Timestamp distribution within an event. [0] = decays, [1] = implants.
 
   //*************************************
+  //      Cluster time monitoring
+  //*************************************
+  TH1I * clustXtXt;
+  TH1I * clustYtYt;
+  TH1I * clustXtYt;
+
+  //*************************************
   //            Decay events
   //*************************************
   TH1I * hEvt_Eside_d[common::N_DSSD][2];     ///< Energy spectrum of decay events for DSSDi and n-/p-sdie [i][n=0,p=1]. 

@@ -423,6 +423,9 @@ void Analysis::CloseEvent(){
         int strip_prev = -999;     //Previously processed strip
         int side_prev  = -999;     //Previously processed side
         Long64_t t_min = -999;     //Earliest timestamp for cluster strips
+        Long64_t t_max = -999;     //Last time stamp difference
+        Long64_t t_srt_dif = -999;
+        Long64_t t_fin_dif = -999;
         Long64_t t_ext_min = -999; //Earliest t_ext for cluster strips
         int n_hits = 0;
         //std::cout << "Size of DSSD" << det+1 << " map: " << decay_hits[det].size() << std::endl;
@@ -437,9 +440,42 @@ void Analysis::CloseEvent(){
             if( (abs(strip_it->first  - strip_prev) == 1 || strip_prev == -999) ){ //If first strip or neighbouring strips on same side, add to cluster
               cluster_e += (strip_it->second).energy;
               ++multi;
+
+              //Check time stamp conditions of cluster
+              if(t_min != -999 && t_max != -999 && b_histograms){
+                t_srt_dif = (strip_it->second).t - t_min;
+                t_fin_dif = (strip_it->second).t - t_max;
+                if(abs(t_srt_dif) < abs(t_fin_dif)){
+                  if(hitSide == 0){
+                    clustXtXt->Fill(t_srt_dif*10);
+                  }
+                  else if (hitSide == 1){
+                    clustYtYt->Fill(t_srt_dif*10);
+                  }
+                }
+                else if(abs(t_srt_dif) > abs(t_fin_dif)){
+                  if(hitSide == 0){
+                    clustXtXt->Fill(t_srt_dif*10);
+                  }
+                  else if (hitSide == 1){
+                    clustYtYt->Fill(t_srt_dif*10);
+                  }                  
+                }
+                else if (abs(t_srt_dif) == abs(t_fin_dif)){
+                  if(hitSide == 0){
+                    clustXtXt->Fill(t_srt_dif*10);
+                  }
+                  else if (hitSide == 1){
+                    clustYtYt->Fill(t_srt_dif*10);
+                  }                   
+                }
+
+
+              }
               
               if( (strip_it->second).energy > max_e)                     { max_e = (strip_it->second).energy; max_strip = (strip_it->second).strip;} //Max_e pos
               if( (strip_it->second).t < t_min || t_min < 0)             { t_min = (strip_it->second).t;}                                            //Earliest tm_stmp in cluster
+              if( (strip_it->second).t < t_max || t_max < 0)             { t_max = (strip_it->second).t;}
               if( (strip_it->second).t_ext < t_ext_min || t_ext_min < 0) { t_ext_min = (strip_it->second).t_ext;}                                    //Earliest external tm_stmp in cluster
               strip_prev = strip_it->first;
               side_prev = hitSide;            
@@ -523,6 +559,7 @@ void Analysis::CloseEvent(){
 	    hEvt_Mult_d[det][0]->Fill( (y_clusts->second).mult );
 	    hEvt_Mult_d[det][1]->Fill( (x_clusts->second).mult );
 	    hEvt_MultXY_d[det][1]->Fill( (x_clusts->second).mult, (y_clusts->second).mult );
+      clustXtYt->Fill(((x_clusts->second).t-(y_clusts->second).t)*10);
 	  }
 
 	  dssd_hit evt(x_clusts->second,y_clusts->second);
@@ -535,7 +572,9 @@ void Analysis::CloseEvent(){
     else if ((x_clusts->second).t == (y_clusts->second).t){
       evt.t = (x_clusts->second).t; evt.t_ext = (x_clusts->second).t_ext;
     }
-	  decay_evts.insert({evt.t,evt});
+    if(abs(((x_clusts->second).t-(y_clusts->second).t))>=200){
+	    decay_evts.insert({evt.t,evt});
+    }
 	  ++dec_num;
 	  b_decay = true;
 	  //std::cout << "Decay pair -> det: " << det+1 << "\t x/y: " << (x_clusts->second).x << "/" << (y_clusts->second).y << "\t ex/ey: " << (x_clusts->second).energy << "/" << (y_clusts->second).energy << "\t t: " << evt.t << std::endl;
@@ -1251,6 +1290,14 @@ void Analysis::InitAnalysis(int opt, char *file_name){
     cEvtXY2_d = new TCanvas("cEvtXY2_d","Multiplicity vs Cluster size (DECAY)", 140,140,1000,800); cEvtXY2_d->Divide(common::N_DSSD,2);
     cEvtMulti_d = new TCanvas("cEvtMulti_d","cEvt Multiplicity (DECAY)", 140,140,1200,800); cEvtMulti_d->Divide(common::N_DSSD,3);
 
+    // ******************************************
+    //    Histograms to monitor cluster timing
+    // ******************************************
+
+    clustXtXt = new TH1I("clustXtXt","Difference in x cluster timings",2e3,-100e3,100e3);
+    clustYtYt = new TH1I("clustYtYt","Difference in y cluster timings",2e3,-100e3,100e3);
+    clustXtYt = new TH1I("clustXtYt","Difference in xy cluster timings",2e3,-100e3,100e3);
+
     for(int i=0; i<common::N_DSSD; ++i) {
 
       //*************************************
@@ -1909,7 +1956,11 @@ void Analysis::WriteHistograms(){
   hTimeStampExt->Write();
   hTimeStampFlag->Write();
 
-  hEvt_TmStpDist->Write();  
+  hEvt_TmStpDist->Write(); 
+
+  clustXtXt->Write();
+  clustYtYt->Write();
+  clustXtYt->Write(); 
 
   /*for(int i=0; i<4; ++i) {
     hEvt_TmStpDist[i]->Write();
@@ -2079,6 +2130,10 @@ void Analysis::ResetHistograms(){
   hTimeStampFlag->Reset();
 
   hEvt_TmStpDist->Reset();  
+
+  clustXtXt->Reset();
+  clustYtYt->Reset();
+  clustXtYt->Reset();
 
   // ******* ADC spectra *******
   for(int i=0; i<common::N_FEE64; ++i){
