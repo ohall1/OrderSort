@@ -426,18 +426,37 @@ void Analysis::CloseEvent(){
         Long64_t t_max = -999;     //Last time stamp difference
         Long64_t t_srt_dif = -999;
         Long64_t t_fin_dif = -999;
+        Long64_t t_short_dif = -999;
         Long64_t t_ext_min = -999; //Earliest t_ext for cluster strips
         int n_hits = 0;
+
         //std::cout << "Size of DSSD" << det+1 << " map: " << decay_hits[det].size() << std::endl;
       
 //      for( side_it = decay_hits[det].begin(); side_it != decay_hits[det].end(); ++side_it ) {
-          for( strip_it = decay_hits[det][hitSide].begin() ; strip_it != decay_hits[det][hitSide].end() ; ++strip_it){  
+          for( strip_it = decay_hits[det][hitSide].begin() ; strip_it != decay_hits[det][hitSide].end() ; ++strip_it){
+
+          if (t_min !=-999){
+            t_srt_dif = (strip_it->second).t - t_min;
+            t_fin_dif = (strip_it->second).t - t_max;
+          }
+
+          if (abs(t_srt_dif) < abs(t_fin_dif)){
+            t_short_dif == t_srt_dif;
+          }
+          else if (abs(t_fin_dif) < abs(t_srt_dif)){
+            t_short_dif = t_fin_dif;
+          } 
+          else{
+            t_short_dif = t_srt_dif;
+          } 
+
+
 
             ++n_hits;
             //std::cout << "Decay n_hit " << n_hits << " >> det: " << (int)(strip_it->second).det << "\t side: " << (int)(side_it->first) << "\t strip: " << (int)((strip_it->second).strip) << "\t e: " << (int)((strip_it->second).energy) << std::endl;
             //std::cout << det <<"det nhits"<<n_hits << " Hello side " << side_prev << " Side now " << hitSide << " strip prev " << strip_prev << " new strip " << (strip_it->first) <<std::endl; 
 
-            if( (abs(strip_it->first  - strip_prev) == 1 || strip_prev == -999) ){ //If first strip or neighbouring strips on same side, add to cluster
+            if( (abs(strip_it->first  - strip_prev) == 1 || strip_prev == -999) && (abs(t_short_dif) < 200 || t_min == -999)){ //If first strip or neighbouring strips on same side, add to cluster
               cluster_e += (strip_it->second).energy;
               ++multi;
 
@@ -507,8 +526,38 @@ void Analysis::CloseEvent(){
               strip_prev = strip_it->first;              // those of current hit event.
               side_prev  = hitSide;               //
               t_min      = (strip_it->second).t;         //
+              t_max      = (strip_it->second).t;         //
               t_ext_min  = (strip_it->second).t_ext;     //                  
-            } //End of cluster writing for side change or discontinuous strips firing 
+            } //End of cluster writing for side change or discontinuous strips firing
+            else if ( abs(t_short_dif) > 200){// If falls outside of the cluster window
+              cluster_evt clust;
+              clust.t      = t_min;
+              clust.t_ext  = t_ext_min;
+              if(side_prev == 0)      {clust.x = -1; clust.y = max_strip;}
+              else if(side_prev == 1) {clust.x = max_strip; clust.y = -1;}
+              clust.z      = det+1;
+              clust.energy = cluster_e;
+              clust.mult   = decay_hits[det][hitSide].size();//multi;
+              clust.flag   = 1;           
+
+                
+              ++dec_hits;
+                
+              decay_clusts[det].insert({side_prev,clust});
+              if(GetBHistograms()){hEvt_Mult_d[det][side_prev]->Fill(multi);}
+              //}   //Otherwise reset variables for next cluster build.
+              //std::cout << "Side decay cluster identified in DSSD " << clust.z << " >> side: " << side_prev << "\t strip: " << max_strip << "\t mult: " << multi << "\t e: " << cluster_e  << "\t t: " << t_min << std::endl;
+              
+              multi      = 1;    //
+              cluster_e  = (strip_it->second).energy;    //
+              max_e      = (strip_it->second).energy;    //
+              max_strip  = strip_it->first;              // Reset cluster variables to
+              strip_prev = strip_it->first;              // those of current hit event.
+              side_prev  = hitSide;               //
+              t_min      = (strip_it->second).t;         //
+              t_max      = (strip_it->second).t;         //
+              t_ext_min  = (strip_it->second).t_ext;     //                  
+            }
 
             if( n_hits == decay_hits[det][hitSide].size() /*&& multi < 7*/ ) {
               cluster_evt clust;
