@@ -460,6 +460,10 @@ void Analysis::CloseEvent(){
               cluster_e += (strip_it->second).energy;
               ++multi;
 
+            if(t_min != -999 && t_max != -999 && b_histograms){
+              t_srt_dif = (strip_it->second).t - t_min;
+              t_fin_dif = (strip_it->second).t - t_max;
+
               //Check time stamp conditions of cluster
                 if(abs(t_srt_dif) < abs(t_fin_dif)){
                   if(hitSide == 0){

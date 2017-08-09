@@ -43,6 +43,7 @@ void Usage(char *progname) {
     fprintf(stderr,"\t-R (enable writing output to Root file)\n");
     fprintf(stderr,"\t-L [RLrun=-1, RLfirst, RLnum] (loop over list of MIDAS data files, overrides option -F if RLrun>0)\n");
     fprintf(stderr,"\t-v (verbose mode)\n");
+    fprintf(stderr,"\t-o [Output file name]\n");
 
     exit(1);
 }
@@ -65,6 +66,8 @@ int main  (int argc, char **argv){
   int i,j;
 
   std::string RunName;
+  std::string userOutFile;
+  bool b_userOutFile = false;
 
   bool b_verbose=false;
 
@@ -173,7 +176,13 @@ int main  (int argc, char **argv){
 	case 'v':
 	  b_verbose = true;
 	  break;
- 
+
+	case 'o':
+	  userOutFile = argv[++i];
+	  b_userOutFile = true;
+	  std::cout << userOutFile <<std::endl;
+	  break;
+ 	
 	default:
 	  Usage(argv[0]);
 	  break;
@@ -205,10 +214,23 @@ int main  (int argc, char **argv){
       FileNameRoot = OutDir+"aida_sort_online.root";
     }
     else if(RLrun>0){
-      sprintf(RLname,"R%d_list",RLrun);   //*********Change here for AIDA/R run prefixes******************//
-      FileNameRoot = OutDir+"aida_sort_"+ std::string(RLname) +".root";
+      if(!b_userOutFile){	
+      	sprintf(RLname,"R%d_list",RLrun);   //*********Change here for AIDA/R run prefixes******************//
+      	FileNameRoot = OutDir+"aida_sort_"+ std::string(RLname) +".root";
+      }
+      else if(b_userOutFile){
+      	FileNameRoot = OutDir +userOutFile;
+      	std::cout <<"here"<<std::endl;
+      }
     }
-    else FileNameRoot = OutDir+"aida_sort_" + RunName +".root";
+    else{
+    	if(!b_userOutFile){
+    		FileNameRoot = OutDir+"aida_sort_" + RunName +".root";
+    	}
+    	else if(b_userOutFile){
+    		FileNameRoot = OutDir+userOutFile;
+    	}
+    }
     fMain = new TFile(FileNameRoot.data(),"RECREATE");
   }
 
