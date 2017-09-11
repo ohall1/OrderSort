@@ -5,7 +5,7 @@
  * Semi-commented C++ file responsible for the analysis section of the AIDA data processing.
  * A class which takes unpakced and calibrated AIDA data, builds events and carries out some analysis.
  *
- * \author A. Estrade (additions from C. Giffin)
+ * \author A. Estrade (additions from C. Giffin and O. Hall)
  * \date
  */
 
@@ -104,7 +104,7 @@ bool Analysis::BuildEvent(Calibrator & my_cal_data){
   t_aida_prev = my_cal_data.GetTimeAIDA();
   evt_data.dt = my_cal_data.GetTimeAIDA() - evt_data.t0; //assume monotonically increasing tm-stps
 
-  //Corrections for multiplexer output offsetting time by 2us
+  //Corrections for multiplexer output offs etting time by 2us
   int ASIC = my_cal_data.GetChannel()/16;
   my_cal_data.SetTimeAIDA(t_aida_prev - (evtPerASIC[my_cal_data.GetModule()-1][ASIC]*200));
   evtPerASIC[my_cal_data.GetModule()-1][ASIC] +=1;
@@ -456,7 +456,7 @@ void Analysis::CloseEvent(){
             //std::cout << "Decay n_hit " << n_hits << " >> det: " << (int)(strip_it->second).det << "\t side: " << (int)(side_it->first) << "\t strip: " << (int)((strip_it->second).strip) << "\t e: " << (int)((strip_it->second).energy) << std::endl;
             //std::cout << det <<"det nhits"<<n_hits << " Hello side " << side_prev << " Side now " << hitSide << " strip prev " << strip_prev << " new strip " << (strip_it->first) <<std::endl; 
 
-            if( (abs(strip_it->first  - strip_prev) == 1 || strip_prev == -999) && (abs(t_short_dif) < 200 || t_min == -999)){ //If first strip or neighbouring strips on same side, add to cluster
+            if( (abs(strip_it->first  - strip_prev) == 1 || strip_prev == -999) /*&& (abs(t_short_dif) < 200 || t_min == -999)*/){ //If first strip or neighbouring strips on same side, add to cluster
               cluster_e += (strip_it->second).energy;
               ++multi;
 
@@ -2447,7 +2447,7 @@ Analysis::Analysis(){
     total_evt_mult[i][0] = 0;
     total_evt_mult[i][1] = 0;
   }
-  event_time_window = 250;
+  event_time_window = 3450;
   dE_i_lim= 2000;
   dX_i_lim= 15;
   E_i_min= 0;
