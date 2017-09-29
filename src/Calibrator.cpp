@@ -569,8 +569,9 @@ bool Calibrator::SetGeometry(){
 void Calibrator::CalibrateADC(){
 
   if(GetADCrange() == 0){  //LowE decay range
-    SetADCenergy( ( GetADCdata() - common::ADC_ZERO - adc_offset[GetModule()-1][GetChannel()] )  //ADC value adjusted for zero-point and offset
+    SetADCenergy( ( GetADCdata() - common::ADC_ZERO - (adc_offset[GetModule()-1][GetChannel()]* adc_polarity[GetModule()-1] ))  //ADC value adjusted for zero-point and offset
 		  * adc_polarity[GetModule()-1] * adc_gain[GetModule()-1][GetChannel()] );       //Multiplied by side parity and gain.
+
   }
 
   else if(GetADCrange() == 1){  //HighE implant range

@@ -202,7 +202,7 @@ int main  (int argc, char **argv){
 
   std::string FileNameData="";
 
-  char *FileCalibParameters= (char*)"config/parameters_N82.txt";
+  char *FileCalibParameters= (char*)"config/parameters_N82_test.txt";
   std::string FileNameRoot=""; //= "aida_sort_" + RunName +".root";
   TFile * fMain; //= new TFile(FileNameRoot.data(),"RECREATE");
 
