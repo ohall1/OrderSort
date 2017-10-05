@@ -601,7 +601,7 @@ void Analysis::CloseEvent(){
 	  hEvt_residualE_d->Fill( (x_clusts->second).energy - (y_clusts->second).energy );
 	}
 	//if( (y_clusts->second).energy > ((x_clusts->second).energy - 100) && (y_clusts->second).energy < ((x_clusts->second).energy + 100)) {
-  if( abs( (y_clusts->second).energy - (x_clusts->second).energy) < 100){
+  if( abs( (y_clusts->second).energy - (x_clusts->second).energy) < 600){
 	  if(b_histograms) {
 	    hEvt_Eside_d[det][0]->Fill((y_clusts->second).energy);
 	    hEvt_Eside_d[det][1]->Fill((x_clusts->second).energy);

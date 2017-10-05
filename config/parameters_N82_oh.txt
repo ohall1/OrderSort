@@ -176,7 +176,7 @@ b_mod_enabled 24 1
 #b_ch_enabled  21  55  0
 #b_ch_enabled  22  55  0
 
-#Offsets for each channel obtained from pulser walkthrough R1300 (09/06/16)
+#Offsets for each channel obtained from pulser walkthrough R28 (04/10/17)
 adc_offset  1  0  -171.716  1.04428   0.133447
 adc_offset  1  1  124.3  7.29074   0.249406
 adc_offset  1  2  -17.8936  1.06441   0.124466
