@@ -151,7 +151,7 @@ bool Analysis::BuildEvent(Calibrator & my_cal_data){
     // std::cout << implant_hits[cal.GetDSSD()-1][cal.GetSide()].size() << " hello" << std::endl;
 
      e_sum_d[cal.GetDSSD()-1][cal.GetADCrange()] += cal.GetADCenergy();
-     ++total_evt_mult[cal.GetDSSD()-1][cal.GetADCrange()];
+     ++total_evt_mult[cal.GetDSSD()-1][cal.GetSide()];
 
      if(imp_evt.det > implantMaxZ){
       implantMaxZ = imp_evt.det;
@@ -181,7 +181,7 @@ void Analysis::BuildDecay(Calibrator & cal){
     decay_hits[cal.GetDSSD()-1][cal.GetSide()].insert({cal.GetStrip(),dec_evt});
     
     e_sum_d[cal.GetDSSD()-1][cal.GetADCrange()] += cal.GetADCenergy();
-    ++total_evt_mult[cal.GetDSSD()-1][cal.GetADCrange()];
+    ++total_evt_mult[cal.GetDSSD()-1][cal.GetSide()];
   }
 
 }
