@@ -401,7 +401,11 @@ void Analysis::CloseEvent(){
       total_evt_mult[0][1] + total_evt_mult[1][1] + total_evt_mult[2][1] + total_evt_mult[3][1] + total_evt_mult[4][1] + total_evt_mult[5][1])>800) 
 	|| 
 	(e_sum_d[0][0] > 5000 &&  e_sum_d[1][0] > 5000 && e_sum_d[2][0] > 5000 && e_sum_d[3][0] > 5000 && e_sum_d[3][0] > 5000 && e_sum_d[4][0] > 5000 && e_sum_d[5][0] > 5000)) {
-      if(GetBHistograms()){hEvt_pulserMult->Fill(total_evt_mult[0][0], total_evt_mult[0][1]);}
+      if(GetBHistograms()){
+        for(int i = 0; i<6; i++){
+          hEvt_pulserMult[i]->Fill(total_evt_mult[i][0], total_evt_mult[i][1]);
+        }
+      }
       ++puls_num;
       b_pulser = true;
     }
@@ -1686,7 +1690,10 @@ void Analysis::InitAnalysis(int opt, char *file_name){
     hEvt_residualE_i = new TH1I("hEvt_residualE_i","Ex-Ey for unpaired implant clusters; Ex - Ey [MeV];Counts",1024,-2000,2000);
     hEvt_residualE_d = new TH1I("hEvt_residualE_d","Ex-Ey for unpaired decay clusters; Ex - Ey [keV];Counts",1024,-2000,2000);
     
-    hEvt_pulserMult = new TH2I("hEvt_pulserMult","Multiplicity of pulser events; x_mult [ch]; y_mult [ch]", 128, 0, 128, 128, 0 ,128);
+    for (int i = 0 ; i < 6 ; i++){
+      sprintf(hname,"hEvt_pulserMultDet%i",i+1);
+      hEvt_pulserMult[i] = new TH2I(hname,"Multiplicity of pulser events; x_mult [ch]; y_mult [ch]", 128, 0, 128, 128, 0 ,128);
+    }
 
     //cEvtHits_d= new TCanvas("cEvtHits_d","cEvt Hit Patterns (DECAY)", 150,150,1200,800); cEvtHits_d->Divide(2,2);
     //cEvtE_d->cd(3);  hEvt_EPulser_d->Draw("colz"); gPad->SetLogz(0);
@@ -2077,7 +2084,9 @@ void Analysis::WriteHistograms(){
   hEvt_residualE_d->Write();
 
   //hEvt_EPulser_d->Write();
-  hEvt_pulserMult->Write();
+  for ( int i = 0 ; i <6 ; i++){
+    hEvt_pulserMult[i]->Write();
+  }
 
   /*for(int i=0; i<common::N_DSSD; ++i){
     
@@ -2239,6 +2248,8 @@ void Analysis::ResetHistograms(){
     hEvt_Mult_i[i][1]->Reset();
     hEvt_MultXY_i[i][0]->Reset();
     hEvt_MultXY_i[i][1]->Reset();
+
+    hEvt_pulserMult[i]->Reset();
   }
   
   hEvt_Mult_impdec->Reset();
@@ -2246,7 +2257,8 @@ void Analysis::ResetHistograms(){
   hEvt_residualE_d->Reset();
 
   //hEvt_EPulser_d->Reset();
-  hEvt_pulserMult->Reset();
+
+  
   
   /*
   for(int i=0; i<common::N_FEE64; ++i){

@@ -308,7 +308,7 @@ class Analysis{
   TH2I * hEvt_MultXY_d[common::N_DSSD][2];    ///< x vs y multiplicity of decay events in each DSSD.
 
   TH2I * hEvt_EPulser_d;                      ///< E_x vs E_y for pulser events. Found by calculating (E1n+...+EN_DSSDn)/N_DSSD vs (E1p+...+EN_DSSDp)/N_DSSD.
-  TH2I * hEvt_pulserMult;
+  TH2I * hEvt_pulserMult[6];
 
   //TH2I * hEvt_ExEy_sum_d[common::N_DSSD];   ///<
   
