@@ -1691,6 +1691,7 @@ void Analysis::InitAnalysis(int opt, char *file_name){
     hEvt_residualE_d = new TH1I("hEvt_residualE_d","Ex-Ey for unpaired decay clusters; Ex - Ey [keV];Counts",1024,-2000,2000);
     
     for (int i = 0 ; i < 6 ; i++){
+      hname[0] = '\0';
       sprintf(hname,"hEvt_pulserMultDet%i",i+1);
       hEvt_pulserMult[i] = new TH2I(hname,"Multiplicity of pulser events; x_mult [ch]; y_mult [ch]", 128, 0, 128, 128, 0 ,128);
     }
@@ -2249,7 +2250,7 @@ void Analysis::ResetHistograms(){
     hEvt_MultXY_i[i][0]->Reset();
     hEvt_MultXY_i[i][1]->Reset();
 
-    hEvt_pulserMult[i]->Reset();
+
   }
   
   hEvt_Mult_impdec->Reset();
@@ -2258,7 +2259,9 @@ void Analysis::ResetHistograms(){
 
   //hEvt_EPulser_d->Reset();
 
-  
+    for (int i = 0 ; i < 6 ; i++){
+      hEvt_pulserMult[i]->Reset(); 
+    }
   
   /*
   for(int i=0; i<common::N_FEE64; ++i){
