@@ -686,7 +686,7 @@ void Analysis::CloseEvent(){
     root_dec.T = ((it->second).t + tmStpCorrOffeset)*10;
     root_dec.ID = 5; // ID 4 defines implant 5 defines decay
     hit = root_dec;
-	  if(tmStpCorrOffeset != 0  && root_dec.ny < 10 && root_dec.nx <10 && implantMaxZ < 1){
+	  if(tmStpCorrOffeset != 0  && root_dec.ny < 10 && root_dec.nx <10){
 	   out_root_tree->Fill();
     }
 	}
