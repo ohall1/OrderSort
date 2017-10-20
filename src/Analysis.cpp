@@ -399,8 +399,8 @@ void Analysis::CloseEvent(){
   if(!b_implant){ //If not an implant event
     if( ((total_evt_mult[0][0] + total_evt_mult[1][0] + total_evt_mult[2][0] + total_evt_mult[3][0] + total_evt_mult[4][0] + total_evt_mult[5][0] +
       total_evt_mult[0][1] + total_evt_mult[1][1] + total_evt_mult[2][1] + total_evt_mult[3][1] + total_evt_mult[4][1] + total_evt_mult[5][1])>800) 
-	/*|| 
-	(e_sum_d[0][0] > 5000 &&  e_sum_d[1][0] > 5000 && e_sum_d[2][0] > 5000 && e_sum_d[3][0] > 5000 && e_sum_d[3][0] > 5000 && e_sum_d[4][0] > 5000 && e_sum_d[5][0] > 5000)*/ ) {
+	|| 
+	(e_sum_d[0][0] > 5000 &&  e_sum_d[1][0] > 5000 && e_sum_d[2][0] > 5000 && e_sum_d[3][0] > 5000 && e_sum_d[3][0] > 5000 && e_sum_d[4][0] > 5000 && e_sum_d[5][0] > 5000)) {
       if(GetBHistograms()){hEvt_pulserMult->Fill(total_evt_mult[0][0], total_evt_mult[0][1]);}
       ++puls_num;
       b_pulser = true;
@@ -412,6 +412,7 @@ void Analysis::CloseEvent(){
   // *******************************************
 
   if(!b_pulser && !b_implant){    // If not a pulser or implant
+    //std::cout << "new event" << std::endl;
     
     for(int det=0; det < common::N_DSSD; ++det) {  // Loop over detectors ( 0 -> common::N_DSSD )
       if ( decay_hits[det][0].size() > 0 && decay_hits[det][1].size() > 0){
@@ -456,7 +457,9 @@ void Analysis::CloseEvent(){
             //std::cout << "Decay n_hit " << n_hits << " >> det: " << (int)(strip_it->second).det << "\t side: " << (int)(side_it->first) << "\t strip: " << (int)((strip_it->second).strip) << "\t e: " << (int)((strip_it->second).energy) << std::endl;
             //std::cout << det <<"det nhits"<<n_hits << " Hello side " << side_prev << " Side now " << hitSide << " strip prev " << strip_prev << " new strip " << (strip_it->first) <<std::endl; 
 
-            if((strip_it->second).energy > 100){
+            if((strip_it->second).energy > 0){
+
+              //std::cout << (strip_it->second).strip << "strip det" << det << " multi" << multi << " hitside " << hitSide << " energy " << (strip_it->second).energy << std::endl;
 
               if( (abs(strip_it->first  - strip_prev) == 1 || strip_prev == -999) /*&& (abs(t_short_dif) < 200 || t_min == -999)*/){ //If first strip or neighbouring strips on same side, add to cluster
                 cluster_e += (strip_it->second).energy;
@@ -600,8 +603,8 @@ void Analysis::CloseEvent(){
 	  hEvt_MultXY_d[det][0]->Fill((x_clusts->second).mult, (y_clusts->second).mult );
 	  hEvt_residualE_d->Fill( (x_clusts->second).energy - (y_clusts->second).energy );
 	}
-	//if( (y_clusts->second).energy > ((x_clusts->second).energy - 100) && (y_clusts->second).energy < ((x_clusts->second).energy + 100)) {
-  if( abs( (y_clusts->second).energy - (x_clusts->second).energy) < 600){
+	if( (y_clusts->second).energy > ((x_clusts->second).energy - 100) && (y_clusts->second).energy < ((x_clusts->second).energy + 100)) {
+  //if( abs( (y_clusts->second).energy - (x_clusts->second).energy) < 100){
 	  if(b_histograms) {
 	    hEvt_Eside_d[det][0]->Fill((y_clusts->second).energy);
 	    hEvt_Eside_d[det][1]->Fill((x_clusts->second).energy);
