@@ -605,7 +605,10 @@ void Analysis::CloseEvent(){
       for(Clust_array::iterator x_clusts = x_it.first; x_clusts != x_it.second; ++x_clusts) {
 	if(b_histograms) {
 	  hEvt_ExEy_d[det][0]->Fill( (x_clusts->second).energy, (y_clusts->second).energy );
-	  hEvt_MultXY_d[det][0]->Fill((x_clusts->second).mult, (y_clusts->second).mult );
+     if (!b_detMult){
+	    hEvt_MultXY_d[det][0]->Fill((x_clusts->second).mult, (y_clusts->second).mult );
+              b_detMult = true;
+    }
 	  hEvt_residualE_d->Fill( (x_clusts->second).energy - (y_clusts->second).energy );
 	}
 	if( (y_clusts->second).energy > ((x_clusts->second).energy - 100) && (y_clusts->second).energy < ((x_clusts->second).energy + 100)) {
@@ -619,10 +622,8 @@ void Analysis::CloseEvent(){
 	    hEvt_Y_d[det]->Fill( y_clusts->first );
 	    hEvt_Mult_d[det][0]->Fill( (y_clusts->second).mult );
 	    hEvt_Mult_d[det][1]->Fill( (x_clusts->second).mult );
-      if (!b_detMult){
         hEvt_MultXY_d[det][1]->Fill( (x_clusts->second).mult, (y_clusts->second).mult );
-        b_detMult = true;
-      }
+
       clustXtYt->Fill(((x_clusts->second).t-(y_clusts->second).t)*10);
 	  }
 
