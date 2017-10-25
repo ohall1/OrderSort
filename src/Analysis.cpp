@@ -641,7 +641,7 @@ void Analysis::CloseEvent(){
 	     }
       }
     }
-    hEvt_MultXY_d[det][1]->Fill( (x_clusts->second).mult, (y_clusts->second).mult );
+    hEvt_MultXY_d[det][1]->Fill( evt.nx, evt.ny );
   }
   
   if(GetBRootTree()){
