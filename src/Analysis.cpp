@@ -596,6 +596,7 @@ void Analysis::CloseEvent(){
 
   //Loop through front and back cluster events to find Ex ~ Ey events
   for(int det=0; det<common::N_DSSD;++det) {
+    bool b_detMult = false;
     std::pair<Clust_array::iterator, Clust_array::iterator> y_it = decay_clusts[det].equal_range(0); //Select y (back) strip clusters
     
     for(Clust_array::iterator y_clusts = y_it.first; y_clusts != y_it.second; ++y_clusts) {
@@ -618,7 +619,10 @@ void Analysis::CloseEvent(){
 	    hEvt_Y_d[det]->Fill( y_clusts->first );
 	    hEvt_Mult_d[det][0]->Fill( (y_clusts->second).mult );
 	    hEvt_Mult_d[det][1]->Fill( (x_clusts->second).mult );
-	    //hEvt_MultXY_d[det][1]->Fill( (x_clusts->second).mult, (y_clusts->second).mult );
+      if (!b_detMult){
+        hEvt_MultXY_d[det][1]->Fill( (x_clusts->second).mult, (y_clusts->second).mult );
+        b_detMult = true;
+      }
       clustXtYt->Fill(((x_clusts->second).t-(y_clusts->second).t)*10);
 	  }
 
@@ -641,7 +645,6 @@ void Analysis::CloseEvent(){
 	     }
       }
     }
-    hEvt_MultXY_d[det][1]->Fill( evt.nx, evt.ny );
   }
   
   if(GetBRootTree()){
