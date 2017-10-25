@@ -618,7 +618,7 @@ void Analysis::CloseEvent(){
 	    hEvt_Y_d[det]->Fill( y_clusts->first );
 	    hEvt_Mult_d[det][0]->Fill( (y_clusts->second).mult );
 	    hEvt_Mult_d[det][1]->Fill( (x_clusts->second).mult );
-	    hEvt_MultXY_d[det][1]->Fill( (x_clusts->second).mult, (y_clusts->second).mult );
+	    //hEvt_MultXY_d[det][1]->Fill( (x_clusts->second).mult, (y_clusts->second).mult );
       clustXtYt->Fill(((x_clusts->second).t-(y_clusts->second).t)*10);
 	  }
 
@@ -641,6 +641,7 @@ void Analysis::CloseEvent(){
 	     }
       }
     }
+    hEvt_MultXY_d[det][1]->Fill( (x_clusts->second).mult, (y_clusts->second).mult );
   }
   
   if(GetBRootTree()){

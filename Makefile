@@ -40,8 +40,8 @@ ifeq '$(HOST)' 'vorbis.ph.ed.ac.uk'
 	LDLIBS=   -L/usr/ucblib -lrt -lpthread -L/Disk/ds-sopa-group/np/RIKEN/AIDAsort/MIDAS/Linux/lib64 -lxfer -ldataspy
 	COMP= ($(CC) $(LDFLAGS) $(LDLIBS) -o $@ $^)
 else
-	INCLUDES=  -I/mnt/c/Users/oscar/Linux/Code/AIDA/AIDALib/DataXferLib/V4_TCP -I/mnt/c/Users/oscar/Linux/Code/AIDA/AIDALib/DataSpyLib
-	LDLIBS=   -L/usr/ucblib -lrt -lpthread -L/mnt/c/Users/oscar/Linux/Code/AIDA/AIDALib/MIDAS/Linux/lib64 -lxfer -ldataspy
+	INCLUDES=  -I/mnt/c/Users/oscar/Documents/LinuxCode/AIDALib/DataXferLib/V4_TCP -I/mnt/c/Users/oscar/Documents/LinuxCode/AIDALib/DataSpyLib
+	LDLIBS=   -L/usr/ucblib -lrt -lpthread -L/mnt/c/Users/oscar/Documents/LinuxCode/AIDALib/MIDAS/Linux/lib64 -lxfer -ldataspy
 	COMP= ($(CC) -o $@ $^ $(LDLIBS) $(LDFLAGS))
 endif
 
